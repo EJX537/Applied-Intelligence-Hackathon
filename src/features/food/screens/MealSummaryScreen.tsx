@@ -47,14 +47,8 @@ export function MealSummaryScreen() {
 
   const totalsRow = (label: string, value: string) => (
     <div className="flex justify-between mb-1.5">
-<<<<<<< HEAD
       <span className="text-text-light">{label}</span>
-      <span className="text-text-app font-semibold">{value}</span>
-=======
-      <span className="text-[#666666]">{label}</span>
-      <span className="text-[#333333] font-semibold">{value}</span>
->>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
-    </div>
+      <span className="text-text-app font-semibold">{value}</span>    </div>
   );
 
   return (
@@ -63,12 +57,7 @@ export function MealSummaryScreen() {
         <img
           src={response.meal.image_uri}
           alt="Meal photo thumbnail"
-<<<<<<< HEAD
-          className="w-full h-[180px] rounded-xl mb-3 bg-border-app object-cover"
-=======
-          className="w-full h-[180px] rounded-xl mb-3 bg-[#E0E0E0] object-cover"
->>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
-        />
+          className="w-full h-[180px] rounded-xl mb-3 bg-border-app object-cover"        />
       )}
       <h1 className="screen-heading">Meal logged</h1>
       <div className="screen-subheading">
@@ -76,12 +65,7 @@ export function MealSummaryScreen() {
       </div>
 
       <div className="card">
-<<<<<<< HEAD
-        <div className="text-[15px] font-semibold text-text-app mb-2">
-=======
-        <div className="text-[15px] font-semibold text-[#333333] mb-2">
->>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
-          Meal totals
+        <div className="text-[15px] font-semibold text-text-app mb-2">          Meal totals
         </div>
         {totalsRow('Calories', `${response.meal.meal_total.calories} kcal`)}
         {totalsRow('Protein', `${response.meal.meal_total.protein_g} g`)}
@@ -89,7 +73,6 @@ export function MealSummaryScreen() {
         {totalsRow('Fat', `${response.meal.meal_total.fat_g} g`)}
       </div>
 
-<<<<<<< HEAD
       <div className="text-[15px] font-bold text-text-app mb-2">Items</div>
       {response.meal.items.map((item, idx) => (
         <div
@@ -102,23 +85,7 @@ export function MealSummaryScreen() {
               P {item.protein_g}g · C {item.carbs_g}g · F {item.fat_g}g
             </div>
           </div>
-          <span className="text-sm font-bold text-primary">
-=======
-      <div className="text-[15px] font-bold text-[#333333] mb-2">Items</div>
-      {response.meal.items.map((item, idx) => (
-        <div
-          key={`${item.name}-${idx}`}
-          className="flex items-center bg-white rounded-xl p-3 mb-2"
-        >
-          <div className="flex-1">
-            <div className="text-[14px] font-semibold text-[#333333]">{item.name}</div>
-            <div className="text-[12px] text-[#666666] mt-0.5">
-              P {item.protein_g}g · C {item.carbs_g}g · F {item.fat_g}g
-            </div>
-          </div>
-          <span className="text-[14px] font-bold text-[#4CAF50]">
->>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
-            {item.calories} kcal
+          <span className="text-sm font-bold text-primary">            {item.calories} kcal
           </span>
         </div>
       ))}
@@ -132,29 +99,13 @@ export function MealSummaryScreen() {
         />
       ))}
 
-<<<<<<< HEAD
       <div className="mt-3 bg-card-app rounded-xl p-3.5 text-center">
         <div className="text-[15px] font-semibold text-text-app">Today's calories</div>
-        <div className="text-2xl font-extrabold text-primary mt-1">
-=======
-      <div
-        className="mt-3 bg-white rounded-xl p-3.5 text-center"
-      >
-        <div className="text-[15px] font-semibold text-[#333333]">Today's calories</div>
-        <div className="text-[24px] font-extrabold text-[#4CAF50] mt-1">
->>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
-          {dailyTotals} kcal
+        <div className="text-2xl font-extrabold text-primary mt-1">          {dailyTotals} kcal
         </div>
       </div>
 
-<<<<<<< HEAD
-      <div className="fixed bottom-0 left-0 right-0 p-4 border-t border-border-app bg-background-app z-10">
-=======
-      <div
-        className="fixed bottom-0 left-0 right-0 p-4 border-t border-solid border-[#E0E0E0] bg-[#F5F5F5]"
-      >
->>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
-        <div className="max-w-[640px] mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 p-4 border-t border-border-app bg-background-app z-10">        <div className="max-w-[640px] mx-auto">
           <button
             type="button"
             onClick={() => navigate('/', { replace: true })}

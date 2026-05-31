@@ -8,10 +8,6 @@ export default defineConfig({
     tailwindcss(),
     react(),
     babel({ presets: [reactCompilerPreset()] }),
-<<<<<<< HEAD
-    tailwindcss()
-=======
->>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
   ],
 
   server: {

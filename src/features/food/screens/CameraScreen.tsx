@@ -120,16 +120,11 @@ export function CameraScreen() {
       const retry = window.confirm(
         'Analysis failed. Click OK to retake, or Cancel to enter manually.',
       );
-<<<<<<< HEAD
       if (retry) {
         handleRetake();
       } else {
         navigate('/manual-search', { replace: true, state: { mealType } });
-      }
-=======
-      if (!retake) navigate('../manual-search', { replace: true, state: { mealType } });
->>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
-    } finally {
+      }    } finally {
       setAnalyzing(false);
     }
   };
@@ -144,33 +139,16 @@ export function CameraScreen() {
   }
 
   return (
-<<<<<<< HEAD
     <div className="app-shell flex flex-col items-center p-6 min-h-screen">
       <h1 className="text-2xl font-bold text-text-app text-center capitalize m-0">
         Log a {mealType}
       </h1>
       <p className="text-sm text-text-light text-center my-2 mb-6">
-        {capturedImage ? 'Review your photo' : 'Position your meal in the viewfinder'}
-=======
-    <div
-      className="app-shell flex flex-col justify-center p-6"
-    >
-      <h1
-        className="text-[24px] font-bold text-[#333333] text-center capitalize m-0"
-      >
-        Log a {mealType}
-      </h1>
-      <p
-        className="text-[14px] text-[#666666] text-center my-2 mb-8"
-      >
-        Upload a photo of your meal to get started.
->>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
-      </p>
+        {capturedImage ? 'Review your photo' : 'Position your meal in the viewfinder'}      </p>
 
       {/* Hidden canvas for frame capture */}
       <canvas ref={canvasRef} className="hidden" />
 
-<<<<<<< HEAD
       {/* Camera Error */}
       {cameraError && !capturedImage && (
         <div className="bg-danger/10 border border-danger rounded-xl py-4 px-5 mb-5 text-danger text-sm text-center w-full max-w-[480px]">
@@ -181,13 +159,7 @@ export function CameraScreen() {
             onClick={startCamera}
           >
             🔄 Try Again
-          </button>
-=======
-      {analyzing ? (
-        <div className="text-center text-[#666666] text-[14px]">
-          Analyzing your meal…
->>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
-        </div>
+          </button>        </div>
       )}
 
       {/* Live Camera Viewfinder */}
@@ -238,23 +210,15 @@ export function CameraScreen() {
           <button
             id="capture-button"
             type="button"
-<<<<<<< HEAD
             onClick={handleCapture}
             aria-label="Capture photo"
-            className="capture-btn"
-=======
-            onClick={() => cameraInputRef.current?.click()}
-            className="btn btn-primary mb-3"
-            aria-label="Take photo with camera"
->>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
-          >
+            className="capture-btn"          >
             {/* Camera SVG Icon */}
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
               <circle cx="12" cy="13" r="4" />
             </svg>
           </button>
-<<<<<<< HEAD
         )}
 
         {/* Retake & Use Photo — visible after capture */}
@@ -297,26 +261,7 @@ export function CameraScreen() {
           className="link-button mt-6 self-center"
         >
           Or search foods manually
-        </button>
-=======
-          <button
-            type="button"
-            onClick={() => galleryInputRef.current?.click()}
-            className="btn btn-secondary mb-3"
-            aria-label="Choose photo from device"
-          >
-            🖼 Choose from Device
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate('../manual-search', { replace: true, state: { mealType } })}
-            className="link-button mt-6 self-center"
-          >
-            Or search foods manually
-          </button>
-        </>
->>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
-      )}
+        </button>      )}
     </div>
   );
 }

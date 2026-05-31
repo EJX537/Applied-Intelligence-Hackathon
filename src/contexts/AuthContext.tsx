@@ -51,7 +51,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string) => {
     setError(null)
-    const res = await insforge.auth.signInWithPassword({ email, password })
+    let res = await insforge.auth.signInWithPassword({ email, password })
+
+    const providerEmail = import.meta.env.VITE_PROVIDER_EMAIL ?? 'provider@healthtrack.com'
+    const providerPassword = import.meta.env.VITE_PROVIDER_PASSWORD ?? 'providerpassword'
+
+    if (res.error && email === providerEmail && password === providerPassword) {
+      // Auto-signup Provider if account doesn't exist yet
+      const signUpRes = await insforge.auth.signUp({ email, password, name: 'Provider' })
+      if (!signUpRes.error) {
+        res = await insforge.auth.signInWithPassword({ email, password })
+      }
+    }
+
     if (res.error) {
       setError(res.error.message)
       throw new Error(res.error.message)
