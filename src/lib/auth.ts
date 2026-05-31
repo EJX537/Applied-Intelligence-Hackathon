@@ -93,6 +93,29 @@ function now(): string {
   return new Date().toISOString()
 }
 
+// ── Seed demo user on first load ───────────────────────────────────────
+
+const DEMO_EMAIL = 'd@d.d'
+const DEMO_PASSWORD = 'd'
+
+function seedDemoUser() {
+  const users = readUsers()
+  if (!users.has(DEMO_EMAIL)) {
+    const user: InsForgeUser = {
+      id: generateId(),
+      email: DEMO_EMAIL,
+      name: 'Demo User',
+      emailVerified: true,
+      createdAt: now(),
+      updatedAt: now(),
+    }
+    users.set(DEMO_EMAIL, { user, password: DEMO_PASSWORD })
+    writeUsers(users)
+  }
+}
+
+seedDemoUser()
+
 // ── Mock client factory ────────────────────────────────────────────────
 
 export function createClient(_config: {

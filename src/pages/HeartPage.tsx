@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import type { HealthKitState, HealthKitActions } from '../hooks/useHealthKit'
+import { toTimeline } from '../lib/chart-data'
 
 function d(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
@@ -11,6 +13,8 @@ function t(iso: string) {
 export function HeartPage({ state, actions }: { state: HealthKitState; actions: HealthKitActions }) {
   const { authorized, loading, heartRateSamples } = state
   const [maxSamples] = useState(20)
+
+  const timeline = useMemo(() => toTimeline(heartRateSamples, 50), [heartRateSamples])
 
   const avg = heartRateSamples.length > 0
     ? Math.round(heartRateSamples.reduce((s, h) => s + h.value, 0) / heartRateSamples.length)
@@ -29,11 +33,59 @@ export function HeartPage({ state, actions }: { state: HealthKitState; actions: 
     <div className="pt-4 space-y-3">
       <h2 className="text-sm font-semibold text-[var(--color-text)] uppercase tracking-wider m-0">Heart Rate</h2>
 
-      {/* Summary row */}
+      {/* Current BPM */}
       {last !== null && (
         <div className="flex items-center justify-center gap-4 py-6">
           <span className="text-5xl font-bold font-mono text-red-500">{Math.round(last)}</span>
           <span className="text-lg text-[var(--color-text)] font-medium">bpm</span>
+        </div>
+      )}
+
+      {/* Area chart */}
+      {timeline.length > 1 && (
+        <div className="rounded-xl bg-red-500/4 border border-red-500/10 p-2">
+          <ResponsiveContainer width="100%" height={180}>
+            <AreaChart data={timeline} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
+              <defs>
+                <linearGradient id="hrGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.04} />
+                </linearGradient>
+              </defs>
+              <XAxis
+                dataKey="time"
+                tick={{ fontSize: 10, fill: 'var(--color-text)' }}
+                axisLine={false}
+                tickLine={false}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                domain={['dataMin - 10', 'dataMax + 10']}
+                tick={{ fontSize: 10, fill: 'var(--color-text)' }}
+                axisLine={false}
+                tickLine={false}
+                width={28}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: 'var(--color-bg)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 8,
+                  fontSize: 12,
+                }}
+                formatter={(val) => [`${Number(val)} bpm`, 'Heart Rate']}
+              />
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke="#ef4444"
+                strokeWidth={2}
+                fill="url(#hrGrad)"
+                dot={false}
+                activeDot={{ r: 4, fill: '#ef4444' }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
       )}
 
