@@ -142,7 +142,7 @@ export function PortionSelectScreen() {
 
   return (
     <div className="app-shell">
-      <h1 style={{ fontSize: 20, fontWeight: 700, color: colors.text, marginBottom: 12 }}>
+      <h1 className="text-[20px] font-bold text-text-app mb-3">
         Confirm portions
       </h1>
       {states.map((s, index) => {
@@ -152,41 +152,18 @@ export function PortionSelectScreen() {
         return (
           <div
             key={`${s.originalName}-${index}`}
-            style={{
-              background: colors.card,
-              borderRadius: 12,
-              padding: 12,
-              marginBottom: 12,
-            }}
+            className="bg-card-app rounded-xl p-3 mb-3"
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div className="flex items-center gap-2">
               <input
                 value={s.editedName}
                 onChange={(e) => update(index, { editedName: e.target.value, edited: true })}
                 aria-label={`Edit name for ${s.originalName}`}
-                style={{
-                  flex: 1,
-                  fontSize: 16,
-                  fontWeight: 600,
-                  color: colors.text,
-                  borderTop: 'none',
-                  borderLeft: 'none',
-                  borderRight: 'none',
-                  borderBottom: `1px solid ${colors.border}`,
-                  background: 'transparent',
-                  padding: '4px 0',
-                }}
+                className="flex-1 text-base font-semibold text-text-app border-b border-border-app bg-transparent py-1 border-t-0 border-l-0 border-r-0 outline-none"
               />
               <ConfidenceBadge confidence={s.item.confidence} />
             </div>
-            <div
-              style={{
-                fontSize: 12,
-                color: colors.textLight,
-                textTransform: 'uppercase',
-                margin: '4px 0',
-              }}
-            >
+            <div className="text-xs text-text-light uppercase my-1">
               {s.item.category}
             </div>
             {!isMixed && (
@@ -203,34 +180,21 @@ export function PortionSelectScreen() {
                 onSubmit={(g) => update(index, { portion_grams: g, customActive: true })}
               />
             )}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginTop: 8,
-              }}
-            >
-              <span style={{ color: colors.textLight, fontSize: 13 }}>Quantity</span>
+            <div className="flex items-center justify-between mt-2">
+              <span className="text-text-light text-[13px]">Quantity</span>
               <QuantityStepper
                 quantity={s.quantity}
                 onChange={(q) => update(index, { quantity: q })}
               />
             </div>
-            <div style={{ marginTop: 10, fontSize: 14, color: colors.text, fontWeight: 600 }}>
+            <div className="mt-2.5 text-sm text-text-app font-semibold">
               {s.portion_grams ?? '—'}g × {s.quantity} = {total}g
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
+            <div className="flex justify-between mt-3">
               <button
                 type="button"
                 onClick={() => update(index, { edited: true })}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: colors.secondary,
-                  fontSize: 13,
-                  fontWeight: 600,
-                }}
+                className="bg-transparent border-none text-secondary text-[13px] font-semibold"
               >
                 Edit name
               </button>
@@ -238,13 +202,7 @@ export function PortionSelectScreen() {
                 type="button"
                 onClick={() => removeAt(index)}
                 aria-label={`Remove ${s.originalName}`}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: colors.danger,
-                  fontSize: 13,
-                  fontWeight: 600,
-                }}
+                className="bg-transparent border-none text-danger text-[13px] font-semibold"
               >
                 Remove
               </button>
@@ -255,26 +213,12 @@ export function PortionSelectScreen() {
       <button
         type="button"
         onClick={addManualItem}
-        style={{
-          width: '100%',
-          background: colors.card,
-          borderRadius: 12,
-          padding: 14,
-          border: `1px dashed ${colors.border}`,
-          color: colors.secondary,
-          fontWeight: 600,
-        }}
+        className="w-full bg-card-app rounded-xl p-3.5 border border-dashed border-border-app text-secondary font-semibold cursor-pointer active:scale-[0.98] transition-transform"
       >
         + Add another item manually
       </button>
 
-      <div
-        style={{
-          padding: '16px 0 24px',
-          marginTop: 16,
-          borderTop: `1px solid ${colors.border}`,
-        }}
-      >
+      <div className="py-4 pb-6 mt-4 border-t border-border-app">
         <button
           type="button"
           onClick={handleConfirm}

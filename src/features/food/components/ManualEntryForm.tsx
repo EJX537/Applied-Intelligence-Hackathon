@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { colors } from '../constants/colors';
 
 interface ManualNutrients {
   calories: number;
@@ -34,96 +33,61 @@ export function ManualEntryForm({ itemName, onSubmit, onSkip }: Props) {
     });
   };
 
-  const rowStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: 10,
-  };
-  const labelStyle: React.CSSProperties = {
-    width: 100,
-    fontSize: 13,
-    color: colors.textLight,
-  };
-  const inputStyle: React.CSSProperties = {
-    flex: 1,
-    height: 40,
-    border: `1px solid ${colors.border}`,
-    borderRadius: 8,
-    padding: '0 10px',
-    background: '#fafafa',
-    color: colors.text,
-    fontSize: 14,
-  };
-
   return (
-    <div
-      style={{
-        background: colors.card,
-        borderRadius: 12,
-        padding: 16,
-        margin: '8px 0',
-      }}
-    >
-      <div style={{ fontSize: 15, fontWeight: 600, color: colors.text, marginBottom: 12 }}>
+    <div className="bg-card-app rounded-xl p-4 my-2">
+      <div className="text-[15px] font-semibold text-text-app mb-3">
         Add nutrition for: {itemName}
       </div>
-      <div style={rowStyle}>
-        <span style={labelStyle}>Calories</span>
+      <div className="flex items-center mb-2.5">
+        <span className="w-[100px] text-[13px] text-text-light">Calories</span>
         <input
           type="number"
           value={calories}
           onChange={(e) => setCalories(e.target.value)}
           placeholder="0"
           aria-label={`Calories for ${itemName}`}
-          style={inputStyle}
+          className="flex-1 h-10 border border-border-app rounded-lg px-2.5 bg-[#fafafa] text-text-app text-sm outline-none"
         />
       </div>
-      <div style={rowStyle}>
-        <span style={labelStyle}>Protein (g)</span>
+      <div className="flex items-center mb-2.5">
+        <span className="w-[100px] text-[13px] text-text-light">Protein (g)</span>
         <input
           type="number"
           value={protein}
           onChange={(e) => setProtein(e.target.value)}
           placeholder="0"
           aria-label={`Protein grams for ${itemName}`}
-          style={inputStyle}
+          className="flex-1 h-10 border border-border-app rounded-lg px-2.5 bg-[#fafafa] text-text-app text-sm outline-none"
         />
       </div>
-      <div style={rowStyle}>
-        <span style={labelStyle}>Carbs (g)</span>
+      <div className="flex items-center mb-2.5">
+        <span className="w-[100px] text-[13px] text-text-light">Carbs (g)</span>
         <input
           type="number"
           value={carbs}
           onChange={(e) => setCarbs(e.target.value)}
           placeholder="0"
           aria-label={`Carbs grams for ${itemName}`}
-          style={inputStyle}
+          className="flex-1 h-10 border border-border-app rounded-lg px-2.5 bg-[#fafafa] text-text-app text-sm outline-none"
         />
       </div>
-      <div style={rowStyle}>
-        <span style={labelStyle}>Fat (g)</span>
+      <div className="flex items-center mb-2.5">
+        <span className="w-[100px] text-[13px] text-text-light">Fat (g)</span>
         <input
           type="number"
           value={fat}
           onChange={(e) => setFat(e.target.value)}
           placeholder="0"
           aria-label={`Fat grams for ${itemName}`}
-          style={inputStyle}
+          className="flex-1 h-10 border border-border-app rounded-lg px-2.5 bg-[#fafafa] text-text-app text-sm outline-none"
         />
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+      <div className="flex flex-col gap-2 mt-2">
         <button
           type="button"
           onClick={handleSave}
           aria-label={`Save nutrition for ${itemName}`}
-          style={{
-            height: 44,
-            borderRadius: 10,
-            background: colors.primary,
-            color: '#fff',
-            fontWeight: 600,
-            border: 'none',
-          }}
+          className="h-11 rounded-lg bg-primary text-white font-semibold border-none active:scale-[0.98] transition-transform"
         >
           Save
         </button>
@@ -131,13 +95,7 @@ export function ManualEntryForm({ itemName, onSubmit, onSkip }: Props) {
           type="button"
           onClick={onSkip}
           aria-label={`Skip and log ${itemName} without nutrition`}
-          style={{
-            height: 44,
-            borderRadius: 10,
-            background: 'transparent',
-            color: colors.textLight,
-            border: `1px solid ${colors.border}`,
-          }}
+          className="h-11 rounded-lg bg-transparent text-text-light border border-border-app active:scale-[0.98] transition-transform"
         >
           Skip — log without nutrition
         </button>

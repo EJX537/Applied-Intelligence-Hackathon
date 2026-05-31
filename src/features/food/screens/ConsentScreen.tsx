@@ -30,52 +30,24 @@ export function ConsentScreen() {
   };
 
   return (
-    <div className="app-shell" style={{ padding: 24, textAlign: 'center' }}>
-      <div
-        style={{
-          width: 96,
-          height: 96,
-          borderRadius: 48,
-          background: colors.card,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '24px auto 16px',
-          fontSize: 48,
-        }}
-      >
+    <div className="app-shell p-6 text-center">
+      <div className="w-24 h-24 rounded-full bg-card-app flex items-center justify-center mx-auto mt-6 mb-4 text-[48px]">
         🍽
       </div>
-      <h1
-        style={{
-          fontSize: 22,
-          fontWeight: 700,
-          color: colors.text,
-          marginBottom: 16,
-        }}
-      >
+      <h1 className="text-[22px] font-bold text-text-app mb-4">
         How we use your meal photos
       </h1>
-      <div
-        style={{
-          background: colors.card,
-          padding: 16,
-          borderRadius: 12,
-          marginBottom: 24,
-          textAlign: 'left',
-          lineHeight: 1.5,
-        }}
-      >
-        <p style={{ margin: '0 0 8px', fontSize: 14, color: colors.text }}>
+      <div className="bg-card-app p-4 rounded-xl mb-6 text-left leading-relaxed">
+        <p className="m-0 mb-2 text-sm text-text-app">
           • Photos are sent to an AI service to identify food items.
         </p>
-        <p style={{ margin: '0 0 8px', fontSize: 14, color: colors.text }}>
+        <p className="m-0 mb-2 text-sm text-text-app">
           • Photos are stored privately in your browser and our servers.
         </p>
-        <p style={{ margin: '0 0 8px', fontSize: 14, color: colors.text }}>
+        <p className="m-0 mb-2 text-sm text-text-app">
           • Photos are never shared with third parties.
         </p>
-        <p style={{ margin: 0, fontSize: 14, color: colors.text }}>
+        <p className="m-0 text-sm text-text-app">
           • You can delete any photo from your meal log at any time.
         </p>
       </div>

@@ -40,45 +40,26 @@ export function LoginScreen() {
   };
 
   return (
-    <div className="app-shell" style={{ padding: 24, textAlign: 'center' }}>
-      <div
-        style={{
-          width: 96,
-          height: 96,
-          borderRadius: 48,
-          background: colors.card,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '48px auto 16px',
-          fontSize: 48,
-        }}
-      >
+    <div className="app-shell p-6 text-center">
+      <div className="w-24 h-24 rounded-full bg-card-app flex items-center justify-center mx-auto mt-12 mb-4 text-[48px]">
         🥗
       </div>
 
-      <h1
-        style={{
-          fontSize: 22,
-          fontWeight: 700,
-          color: colors.text,
-          marginBottom: 4,
-        }}
-      >
+      <h1 className="text-[22px] font-bold text-text-app mb-1">
         {mode === 'sign-in' ? 'Welcome back' : 'Create account'}
       </h1>
-      <p style={{ fontSize: 14, color: colors.textLight, marginBottom: 24 }}>
+      <p className="text-sm text-text-light mb-6">
         {mode === 'sign-in'
           ? 'Sign in to track your meals'
           : 'Sign up to start tracking meals'}
       </p>
 
-      <form onSubmit={handleSubmit} style={{ textAlign: 'left' }}>
+      <form onSubmit={handleSubmit} className="text-left">
         {mode === 'sign-up' && (
-          <div style={{ marginBottom: 12 }}>
+          <div className="mb-3">
             <label
               htmlFor="login-name"
-              style={{ fontSize: 13, fontWeight: 600, color: colors.textLight, marginBottom: 4, display: 'block' }}
+              className="text-[13px] font-semibold text-text-light mb-1 block"
             >
               Name (optional)
             </label>
@@ -94,10 +75,10 @@ export function LoginScreen() {
           </div>
         )}
 
-        <div style={{ marginBottom: 12 }}>
+        <div className="mb-3">
           <label
             htmlFor="login-email"
-            style={{ fontSize: 13, fontWeight: 600, color: colors.textLight, marginBottom: 4, display: 'block' }}
+            className="text-[13px] font-semibold text-text-light mb-1 block"
           >
             Email
           </label>
@@ -113,10 +94,10 @@ export function LoginScreen() {
           />
         </div>
 
-        <div style={{ marginBottom: 16 }}>
+        <div className="mb-4">
           <label
             htmlFor="login-password"
-            style={{ fontSize: 13, fontWeight: 600, color: colors.textLight, marginBottom: 4, display: 'block' }}
+            className="text-[13px] font-semibold text-text-light mb-1 block"
           >
             Password
           </label>
@@ -133,17 +114,7 @@ export function LoginScreen() {
         </div>
 
         {error && (
-          <div
-            style={{
-              background: '#FFF3F3',
-              border: `1px solid ${colors.danger}`,
-              borderRadius: 10,
-              padding: '10px 14px',
-              marginBottom: 14,
-              fontSize: 13,
-              color: colors.danger,
-            }}
-          >
+          <div className="bg-[#FFF3F3] border border-danger rounded-[10px] py-2.5 px-3.5 mb-3.5 text-[13px] text-danger">
             {error}
           </div>
         )}
@@ -162,7 +133,7 @@ export function LoginScreen() {
         </button>
       </form>
 
-      <div style={{ marginTop: 20, fontSize: 14, color: colors.textLight }}>
+      <div className="mt-5 text-sm text-text-light">
         {mode === 'sign-in' ? (
           <>
             Don&apos;t have an account?{' '}

@@ -140,63 +140,24 @@ export function CameraScreen() {
   }
 
   return (
-    <div
-      className="app-shell"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: 24,
-        minHeight: '100vh',
-      }}
-    >
-      <h1
-        style={{
-          fontSize: 24,
-          fontWeight: 700,
-          color: colors.text,
-          textAlign: 'center',
-          textTransform: 'capitalize',
-          margin: 0,
-        }}
-      >
+    <div className="app-shell flex flex-col items-center p-6 min-h-screen">
+      <h1 className="text-2xl font-bold text-text-app text-center capitalize m-0">
         Log a {mealType}
       </h1>
-      <p
-        style={{
-          fontSize: 14,
-          color: colors.textLight,
-          textAlign: 'center',
-          margin: '8px 0 24px',
-        }}
-      >
+      <p className="text-sm text-text-light text-center my-2 mb-6">
         {capturedImage ? 'Review your photo' : 'Position your meal in the viewfinder'}
       </p>
 
       {/* Hidden canvas for frame capture */}
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
+      <canvas ref={canvasRef} className="hidden" />
 
       {/* Camera Error */}
       {cameraError && !capturedImage && (
-        <div
-          style={{
-            background: 'rgba(244,67,54,0.1)',
-            border: `1px solid ${colors.danger}`,
-            borderRadius: 12,
-            padding: '16px 20px',
-            marginBottom: 20,
-            color: colors.danger,
-            fontSize: 14,
-            textAlign: 'center',
-            width: '100%',
-            maxWidth: 480,
-          }}
-        >
+        <div className="bg-danger/10 border border-danger rounded-xl py-4 px-5 mb-5 text-danger text-sm text-center w-full max-w-[480px]">
           {cameraError}
           <button
             type="button"
-            className="btn btn-primary"
-            style={{ marginTop: 12 }}
+            className="btn btn-primary mt-3"
             onClick={startCamera}
           >
             🔄 Try Again
@@ -206,66 +167,22 @@ export function CameraScreen() {
 
       {/* Live Camera Viewfinder */}
       {!capturedImage && !cameraError && (
-        <div
-          style={{
-            position: 'relative',
-            width: '100%',
-            maxWidth: 480,
-            aspectRatio: '4 / 3',
-            borderRadius: 20,
-            overflow: 'hidden',
-            background: '#000',
-            marginBottom: 24,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-          }}
-        >
+        <div className="relative w-full max-w-[480px] aspect-[4/3] rounded-2xl overflow-hidden bg-black mb-6 shadow-xl">
           <video
             ref={videoRef}
             autoPlay
             playsInline
             muted
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              transform: 'scaleX(-1)',
-            }}
+            className="w-full h-full object-cover -scale-x-100"
           />
           {/* Viewfinder overlay corners */}
           {cameraReady && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 16,
-                border: '2px solid rgba(255,255,255,0.3)',
-                borderRadius: 12,
-                pointerEvents: 'none',
-              }}
-            />
+            <div className="absolute inset-4 border-2 border-white/30 rounded-xl pointer-events-none" />
           )}
           {/* Camera loading indicator */}
           {!cameraReady && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                fontSize: 14,
-              }}
-            >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  border: '3px solid rgba(255,255,255,0.3)',
-                  borderTopColor: '#fff',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                }}
-              />
+            <div className="absolute inset-0 flex items-center justify-center text-white text-sm">
+              <div className="w-8 h-8 border-3 border-white/30 border-t-white rounded-full animate-spin" />
             </div>
           )}
         </div>
@@ -273,51 +190,16 @@ export function CameraScreen() {
 
       {/* Captured Image Preview */}
       {capturedImage && (
-        <div
-          style={{
-            width: '100%',
-            maxWidth: 480,
-            aspectRatio: '4 / 3',
-            borderRadius: 20,
-            overflow: 'hidden',
-            marginBottom: 24,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-            position: 'relative',
-          }}
-        >
+        <div className="relative w-full max-w-[480px] aspect-[4/3] rounded-2xl overflow-hidden mb-6 shadow-xl">
           <img
             src={capturedImage}
             alt="Captured meal"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
+            className="w-full h-full object-cover"
           />
           {analyzing && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'rgba(0,0,0,0.5)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                gap: 12,
-              }}
-            >
-              <div
-                style={{
-                  width: 40,
-                  height: 40,
-                  border: '4px solid rgba(255,255,255,0.3)',
-                  borderTopColor: '#fff',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                }}
-              />
-              <span style={{ color: '#fff', fontSize: 14, fontWeight: 600 }}>
+            <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-3">
+              <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="text-white text-sm font-semibold">
                 Analyzing your meal…
               </span>
             </div>
@@ -326,16 +208,7 @@ export function CameraScreen() {
       )}
 
       {/* Controls */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 12,
-          width: '100%',
-          maxWidth: 480,
-        }}
-      >
+      <div className="flex flex-col items-center gap-3 w-full max-w-[480px]">
         {!capturedImage && cameraReady && (
           <button
             id="capture-button"
@@ -354,22 +227,15 @@ export function CameraScreen() {
 
         {/* Retake & Use Photo — visible after capture */}
         {capturedImage && !analyzing && (
-          <div
-            style={{
-              display: 'flex',
-              gap: 12,
-              width: '100%',
-            }}
-          >
+          <div className="flex gap-3 w-full">
             <button
               id="retake-button"
               type="button"
               onClick={handleRetake}
-              className="btn btn-secondary"
-              style={{ flex: 1 }}
+              className="btn btn-secondary flex-1"
               aria-label="Retake photo"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 8 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
                 <polyline points="1 4 1 10 7 10" />
                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
               </svg>
@@ -379,11 +245,10 @@ export function CameraScreen() {
               id="use-photo-button"
               type="button"
               onClick={handleUsePhoto}
-              className="btn btn-primary"
-              style={{ flex: 1 }}
+              className="btn btn-primary flex-1"
               aria-label="Use this photo"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 8 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
               Use Photo
@@ -397,19 +262,11 @@ export function CameraScreen() {
         <button
           type="button"
           onClick={() => navigate('/manual-search', { replace: true, state: { mealType } })}
-          className="link-button"
-          style={{ marginTop: 24, alignSelf: 'center' }}
+          className="link-button mt-6 self-center"
         >
           Or search foods manually
         </button>
       )}
-
-      {/* Spinner animation */}
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }

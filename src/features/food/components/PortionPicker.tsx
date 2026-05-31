@@ -1,5 +1,4 @@
 import type { PortionOption } from '../types';
-import { colors } from '../constants/colors';
 
 interface Props {
   options: PortionOption[];
@@ -16,29 +15,15 @@ export function PortionPicker({
   onCustomPress,
   customActive,
 }: Props) {
-  const chipStyle = (selected: boolean): React.CSSProperties => ({
-    minWidth: 84,
-    padding: '10px 12px',
-    borderRadius: 12,
-    border: `1px solid ${selected ? colors.primary : colors.border}`,
-    background: selected ? colors.primary : colors.card,
-    color: selected ? '#fff' : colors.text,
-    cursor: 'pointer',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    flexShrink: 0,
-  });
+  const getChipClass = (selected: boolean) =>
+    `min-w-[84px] py-2.5 px-3 rounded-xl border flex flex-col items-center shrink-0 cursor-pointer transition-all active:scale-[0.95] ${
+      selected
+        ? 'border-primary bg-primary text-white'
+        : 'border-border-app bg-card-app text-text-app'
+    }`;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        gap: 8,
-        overflowX: 'auto',
-        padding: '8px 0',
-      }}
-    >
+    <div className="flex gap-2 overflow-x-auto py-2">
       {options.map((opt) => {
         const isSelected = !customActive && selectedGrams === opt.grams;
         return (
@@ -48,35 +33,16 @@ export function PortionPicker({
             onClick={() => onSelect(opt.grams)}
             aria-label={`${opt.label}, ${opt.grams} grams, ${opt.visual}`}
             aria-pressed={isSelected}
-            style={chipStyle(isSelected)}
+            className={getChipClass(isSelected)}
           >
-            <span
-              style={{
-                fontSize: 16,
-                fontWeight: 700,
-                color: isSelected ? '#fff' : colors.textLight,
-              }}
-            >
+            <span className={`text-base font-bold ${isSelected ? 'text-white' : 'text-text-light'}`}>
               {opt.ref}
             </span>
-            <span style={{ fontSize: 13, fontWeight: 600, marginTop: 2 }}>{opt.label}</span>
-            <span
-              style={{
-                fontSize: 12,
-                marginTop: 2,
-                color: isSelected ? '#fff' : colors.textLight,
-              }}
-            >
+            <span className="text-[13px] font-semibold mt-0.5">{opt.label}</span>
+            <span className={`text-xs mt-0.5 ${isSelected ? 'text-white' : 'text-text-light'}`}>
               {opt.grams}g
             </span>
-            <span
-              style={{
-                fontSize: 10,
-                marginTop: 2,
-                textAlign: 'center',
-                color: isSelected ? '#fff' : colors.textLight,
-              }}
-            >
+            <span className={`text-[10px] mt-0.5 text-center ${isSelected ? 'text-white' : 'text-text-light'}`}>
               {opt.visual}
             </span>
           </button>
@@ -87,25 +53,13 @@ export function PortionPicker({
         onClick={onCustomPress}
         aria-label="Set a custom portion in grams"
         aria-pressed={customActive}
-        style={chipStyle(customActive)}
+        className={getChipClass(customActive)}
       >
-        <span
-          style={{
-            fontSize: 16,
-            fontWeight: 700,
-            color: customActive ? '#fff' : colors.textLight,
-          }}
-        >
+        <span className={`text-base font-bold ${customActive ? 'text-white' : 'text-text-light'}`}>
           +
         </span>
-        <span style={{ fontSize: 13, fontWeight: 600, marginTop: 2 }}>Custom</span>
-        <span
-          style={{
-            fontSize: 12,
-            marginTop: 2,
-            color: customActive ? '#fff' : colors.textLight,
-          }}
-        >
+        <span className="text-[13px] font-semibold mt-0.5">Custom</span>
+        <span className={`text-xs mt-0.5 ${customActive ? 'text-white' : 'text-text-light'}`}>
           set grams
         </span>
       </button>

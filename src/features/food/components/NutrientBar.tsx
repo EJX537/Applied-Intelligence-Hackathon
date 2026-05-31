@@ -1,4 +1,3 @@
-import { colors } from '../constants/colors';
 
 interface Props {
   label: string;
@@ -15,32 +14,20 @@ export function NutrientBar({ label, value, target, unit, color }: Props) {
 
   return (
     <div
-      style={{ margin: '6px 0' }}
+      className="my-1.5"
       aria-label={`${label}: ${value} of ${target} ${unit}, ${percentLabel} percent`}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-        <span style={{ fontSize: 13, color: colors.text, fontWeight: 600 }}>{label}</span>
-        <span style={{ fontSize: 12, color: colors.textLight }}>
+      <div className="flex justify-between mb-1">
+        <span className="text-[13px] text-text-app font-semibold">{label}</span>
+        <span className="text-xs text-text-light">
           {value}/{target}
           {unit}
         </span>
       </div>
-      <div
-        style={{
-          height: 8,
-          background: colors.border,
-          borderRadius: 4,
-          overflow: 'hidden',
-        }}
-      >
+      <div className="h-2 bg-border-app rounded-full overflow-hidden">
         <div
-          style={{
-            height: '100%',
-            width: `${widthPct}%`,
-            background: color,
-            borderRadius: 4,
-            transition: 'width 200ms ease',
-          }}
+          className={`h-full ${color} rounded-full transition-[width] duration-200 ease-in-out`}
+          style={{ width: `${widthPct}%` }}
         />
       </div>
     </div>

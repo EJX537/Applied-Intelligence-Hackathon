@@ -15,7 +15,7 @@ export function CustomGramInput({ onSubmit }: Props) {
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+    <div className="flex items-center gap-2 mt-2">
       <input
         type="number"
         inputMode="numeric"
@@ -26,30 +26,13 @@ export function CustomGramInput({ onSubmit }: Props) {
         }}
         placeholder="grams"
         aria-label="Custom portion in grams"
-        style={{
-          flex: 1,
-          height: 40,
-          border: `1px solid ${colors.border}`,
-          borderRadius: 8,
-          padding: '0 12px',
-          background: colors.card,
-          color: colors.text,
-          fontSize: 14,
-        }}
+        className="flex-1 h-10 border border-border-app rounded-lg px-3 bg-card-app text-text-app text-sm outline-none"
       />
       <button
         type="button"
         onClick={handleSubmit}
         aria-label="Set custom grams"
-        style={{
-          background: colors.primary,
-          color: '#fff',
-          fontWeight: 600,
-          border: 'none',
-          height: 40,
-          padding: '0 16px',
-          borderRadius: 8,
-        }}
+        className="bg-primary text-white font-semibold border-none h-10 px-4 rounded-lg active:scale-[0.98] transition-transform"
       >
         Set
       </button>

@@ -50,17 +50,17 @@ export function FoodLogScreen() {
 
   return (
     <div className="app-shell">
-      <div style={{ fontSize: 14, color: colors.textLight, marginBottom: 12 }}>{todayLabel()}</div>
+      <div className="text-sm text-text-light mb-3">{todayLabel()}</div>
       <DailySummary totals={dailyTotals} targets={DAILY_TARGETS} />
-      <div style={{ fontSize: 15, fontWeight: 700, color: colors.text, marginBottom: 8 }}>
+      <div className="text-[15px] font-bold text-text-app mb-2">
         Today's meals
       </div>
       {meals.length === 0 ? (
-        <div style={{ color: colors.textLight, textAlign: 'center', marginTop: 32 }}>
+        <div className="text-text-light text-center mt-8">
           No meals logged today — tap + to start
         </div>
       ) : (
-        <div style={{ paddingBottom: 80 }}>
+        <div className="pb-20">
           {meals.map((m) => (
             <MealCard key={m.id} meal={m} onDelete={removeMeal} />
           ))}
@@ -80,15 +80,7 @@ export function FoodLogScreen() {
         <div
           role="dialog"
           aria-label="Add a meal"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.4)',
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            zIndex: 10,
-          }}
+          className="fixed inset-0 bg-black/40 flex items-end justify-center z-10"
           onClick={() => {
             setShowSheet(false);
             setPendingAction(null);
@@ -96,21 +88,14 @@ export function FoodLogScreen() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            style={{
-              background: colors.card,
-              borderRadius: '16px 16px 0 0',
-              padding: 16,
-              width: '100%',
-              maxWidth: 640,
-            }}
+            className="bg-card-app rounded-t-2xl p-4 w-full max-w-[640px]"
           >
             {pendingAction === null ? (
               <>
-                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Add a meal</div>
+                <div className="font-bold text-base mb-3">Add a meal</div>
                 <button
                   type="button"
-                  className="btn btn-primary"
-                  style={{ marginBottom: 8, gap: 8 }}
+                  className="btn btn-primary mb-2 gap-2"
                   onClick={() => setPendingAction('photo')}
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -121,8 +106,7 @@ export function FoodLogScreen() {
                 </button>
                 <button
                   type="button"
-                  className="btn btn-secondary"
-                  style={{ marginBottom: 8 }}
+                  className="btn btn-secondary mb-2"
                   onClick={() => setPendingAction('search')}
                 >
                   🔍 Search Food
@@ -137,13 +121,12 @@ export function FoodLogScreen() {
               </>
             ) : (
               <>
-                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Which meal?</div>
+                <div className="font-bold text-base mb-3">Which meal?</div>
                 {MEAL_TYPES.map((mt) => (
                   <button
                     type="button"
                     key={mt}
-                    className="btn btn-secondary"
-                    style={{ marginBottom: 8 }}
+                    className="btn btn-secondary mb-2"
                     onClick={() => handlePickMealType(mt)}
                   >
                     {mt.charAt(0).toUpperCase() + mt.slice(1)}
