@@ -1,18 +1,22 @@
+import { useLocation } from 'react-router-dom'
 import { usePwaMode } from '../../hooks/usePwaMode'
 import { ModeBadge } from '../ModeBadge'
 import { TabBar } from './TabBar'
 import type { TabId } from './TabBar'
 
-export function AppLayout({
-  activeTab,
-  onTabChange,
-  children,
-}: {
-  activeTab: TabId
-  onTabChange: (id: TabId) => void
-  children: React.ReactNode
-}) {
+// Map pathname to tab id
+function pathToTab(pathname: string): TabId {
+  const p = pathname.replace(/^\/#?/, '').split('/')[0]
+  if (p === 'steps') return 'steps'
+  if (p === 'heart') return 'heart'
+  if (p === 'activity') return 'activity'
+  return 'dashboard'
+}
+
+export function AppLayout({ children }: { children: React.ReactNode }) {
   const mode = usePwaMode()
+  const loc = useLocation()
+  const activeTab: TabId = pathToTab(loc.pathname)
 
   return (
     <div className="absolute inset-0 flex flex-col overflow-hidden">
@@ -38,7 +42,7 @@ export function AppLayout({
       </main>
 
       {/* ── Bottom nav ── */}
-      <TabBar active={activeTab} onSelect={onTabChange} />
+      <TabBar active={activeTab} />
     </div>
   )
 }

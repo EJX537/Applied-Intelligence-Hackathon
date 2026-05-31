@@ -1,19 +1,17 @@
+import { useNavigate } from 'react-router-dom'
+
 export type TabId = 'dashboard' | 'steps' | 'heart' | 'activity'
 
-const tabs: { id: TabId; icon: string; label: string }[] = [
-  { id: 'dashboard', icon: '◉', label: 'Dashboard' },
-  { id: 'steps', icon: '👣', label: 'Steps' },
-  { id: 'heart', icon: '❤️', label: 'Heart' },
-  { id: 'activity', icon: '🏃', label: 'Activity' },
+const tabs: { id: TabId; icon: string; label: string; route: string }[] = [
+  { id: 'dashboard', icon: '◉', label: 'Dashboard', route: '/' },
+  { id: 'steps', icon: '👣', label: 'Steps', route: '/steps' },
+  { id: 'heart', icon: '❤️', label: 'Heart', route: '/heart' },
+  { id: 'activity', icon: '🏃', label: 'Activity', route: '/activity' },
 ]
 
-export function TabBar({
-  active,
-  onSelect,
-}: {
-  active: TabId
-  onSelect: (id: TabId) => void
-}) {
+export function TabBar({ active }: { active: TabId }) {
+  const navigate = useNavigate()
+
   return (
     <nav className="shrink-0 border-t border-[var(--color-border)] bg-[var(--color-bg)]/90 backdrop-blur-xl">
       {/* Tab buttons */}
@@ -23,7 +21,7 @@ export function TabBar({
           return (
             <button
               key={t.id}
-              onClick={() => onSelect(t.id)}
+              onClick={() => navigate(t.route)}
               className={`flex-1 flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-[10px] font-medium transition-colors cursor-pointer border-none bg-transparent ${
                 isActive ? 'text-green-500' : 'text-[var(--color-text)]'
               }`}
