@@ -25,11 +25,14 @@ pnpm-debug.log*
 web-build/
 coverage/
 
-# Env
+# Env (do not commit secrets)
 .env
 .env.local
 .env.*.local
 .env.*
+
+# Allow a non-secret template to be committed
+!.env.example
 
 # macOS
 .DS_Store
