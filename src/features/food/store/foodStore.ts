@@ -1,0 +1,49 @@
+// Zustand store for the food feature: today's meals and current photo analysis state.
+
+import { create } from 'zustand';
+import type { MealEntry, NutritionTotals, RecognizedItem } from '../types';
+
+const EMPTY_TOTALS: NutritionTotals = {
+  calories: 0,
+  protein_g: 0,
+  carbs_g: 0,
+  fat_g: 0,
+  fiber_g: 0,
+  sugar_g: 0,
+  sodium_mg: 0,
+};
+
+interface FoodState {
+  meals: MealEntry[];
+  currentItems: RecognizedItem[];
+  currentImageUri: string | null;
+  setCurrentAnalysis: (imageUri: string, items: RecognizedItem[]) => void;
+  addMeal: (meal: MealEntry) => void;
+  removeMeal: (mealId: string) => void;
+  clearCurrentAnalysis: () => void;
+  getDailyTotals: () => NutritionTotals;
+}
+
+export const useFoodStore = create<FoodState>((set, get) => ({
+  meals: [],
+  currentItems: [],
+  currentImageUri: null,
+  setCurrentAnalysis: (imageUri, items) =>
+    set({ currentImageUri: imageUri, currentItems: items }),
+  addMeal: (meal) => set((s) => ({ meals: [meal, ...s.meals] })),
+  removeMeal: (mealId) => set((s) => ({ meals: s.meals.filter((m) => m.id !== mealId) })),
+  clearCurrentAnalysis: () => set({ currentImageUri: null, currentItems: [] }),
+  getDailyTotals: () =>
+    get().meals.reduce<NutritionTotals>(
+      (acc, m) => ({
+        calories: acc.calories + m.meal_total.calories,
+        protein_g: acc.protein_g + m.meal_total.protein_g,
+        carbs_g: acc.carbs_g + m.meal_total.carbs_g,
+        fat_g: acc.fat_g + m.meal_total.fat_g,
+        fiber_g: acc.fiber_g + m.meal_total.fiber_g,
+        sugar_g: acc.sugar_g + m.meal_total.sugar_g,
+        sodium_mg: acc.sodium_mg + m.meal_total.sodium_mg,
+      }),
+      { ...EMPTY_TOTALS },
+    ),
+}));
