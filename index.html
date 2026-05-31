@@ -1,13 +1,990 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>applied-intelligence-hackathon</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HealthTrack">
+<title>HealthTrack</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  background: #f2f2f7;
+  height: 100%;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  color: #1c1c1e;
+}
+
+/* ── Safe Areas ── */
+:root {
+  --safe-top:    env(safe-area-inset-top,    44px);
+  --safe-bottom: env(safe-area-inset-bottom, 34px);
+  --safe-left:   env(safe-area-inset-left,   0px);
+  --safe-right:  env(safe-area-inset-right,  0px);
+  --tab-height:  calc(56px + var(--safe-bottom));
+  --nav-height:  calc(52px + var(--safe-top));
+
+  --blue:     #007AFF;
+  --green:    #34C759;
+  --orange:   #FF9500;
+  --red:      #FF3B30;
+  --purple:   #AF52DE;
+  --teal:     #32ADE6;
+  --gold:     #FFD60A;
+  --label:    #1c1c1e;
+  --label2:   #3c3c43;
+  --label3:   #8e8e93;
+  --separator:#c6c6c8;
+  --fill:     #e5e5ea;
+  --fill2:    #ebebf0;
+  --bg:       #f2f2f7;
+  --bg2:      #ffffff;
+  --bg3:      #f2f2f7;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.10), 0 0 0 0.5px rgba(0,0,0,0.06);
+}
+
+/* ── App Shell ── */
+#app { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── Navigation Bar ── */
+.nav-bar {
+  background: rgba(249,249,249,0.92);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid var(--separator);
+  padding-top: var(--safe-top);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  flex-shrink: 0;
+  z-index: 100;
+}
+.nav-inner {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+.nav-title { font-size: 17px; font-weight: 600; color: var(--label); letter-spacing: -0.3px; }
+.nav-subtitle { font-size: 11px; color: var(--label3); margin-top: 1px; }
+.nav-action {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  border: none; cursor: pointer;
+  font-size: 18px; color: #fff;
+  flex-shrink: 0;
+}
+
+/* ── Screen Container ── */
+.screens {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: var(--tab-height);
+  display: none;
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+}
+.screen.active { display: block; }
+
+/* ── Tab Bar ── */
+.tab-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--tab-height);
+  background: rgba(249,249,249,0.92);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 0.5px solid var(--separator);
+  display: flex;
+  align-items: flex-start;
+  padding-top: 8px;
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  z-index: 200;
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s;
+}
+.tab-item:active { transform: scale(0.92); }
+.tab-icon { font-size: 22px; line-height: 1; }
+.tab-label { font-size: 10px; font-weight: 500; color: var(--label3); letter-spacing: 0.1px; }
+.tab-item.active .tab-label { color: var(--blue); }
+.tab-item.active .tab-icon  { filter: none; }
+.tab-badge {
+  position: absolute;
+  top: -2px; right: -6px;
+  background: var(--red);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 9px;
+  padding: 1px 5px;
+  min-width: 16px;
+  text-align: center;
+  border: 1.5px solid #f9f9f9;
+}
+.tab-icon-wrap { position: relative; display: inline-block; }
+
+/* ── Section Headers ── */
+.section-header {
+  padding: 22px 16px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--label3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--bg2);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+.card-group {
+  margin: 0 16px 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+.card-row {
+  background: var(--bg2);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 0.5px solid var(--separator);
+}
+.card-row:last-child { border-bottom: none; }
+
+/* ── HOME SCREEN ── */
+.hero-banner {
+  background: linear-gradient(145deg, #1a5276, #2e86c1);
+  padding: 20px 20px 24px;
+  margin: 12px 16px;
+  border-radius: 16px;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(26,82,118,0.35);
+}
+.hero-org { font-size: 11px; font-weight: 600; opacity: 0.75; letter-spacing: 0.8px; text-transform: uppercase; }
+.hero-title { font-size: 22px; font-weight: 700; margin-top: 4px; letter-spacing: -0.5px; }
+.hero-sub   { font-size: 13px; opacity: 0.8; margin-top: 3px; }
+.hero-gift  {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px; font-weight: 600;
+  margin-top: 14px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0 16px 16px;
+}
+.stat-tile {
+  background: var(--bg2);
+  border-radius: 12px;
+  padding: 14px 14px 12px;
+  box-shadow: var(--card-shadow);
+}
+.stat-tile .st-icon  { font-size: 22px; margin-bottom: 6px; }
+.stat-tile .st-value { font-size: 26px; font-weight: 700; color: var(--label); line-height: 1; }
+.stat-tile .st-label { font-size: 12px; color: var(--label3); margin-top: 3px; }
+.stat-tile.blue  .st-value { color: var(--blue);   }
+.stat-tile.green .st-value { color: var(--green);  }
+.stat-tile.gold  .st-value { color: #d4a017;        }
+.stat-tile.orange .st-value{ color: var(--orange);  }
+
+/* Weight bar */
+.weight-card { margin: 0 16px 16px; }
+.weight-bar-track {
+  height: 10px; border-radius: 5px;
+  display: flex; overflow: hidden;
+  margin: 10px 0 8px;
+}
+.w-seg-m { height: 100%; transition: width .3s; }
+.weight-labels { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+.w-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.w-lbl-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--label2); }
+
+/* ── PATIENTS SCREEN ── */
+.search-bar {
+  padding: 8px 16px 4px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+}
+.search-input {
+  width: 100%;
+  background: var(--fill2);
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px 8px 34px;
+  font-size: 16px;
+  color: var(--label);
+  outline: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238e8e93' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+}
+.search-input::placeholder { color: var(--label3); }
+
+.filter-chips {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.filter-chips::-webkit-scrollbar { display: none; }
+.chip {
+  white-space: nowrap;
+  padding: 5px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--separator);
+  background: var(--bg2);
+  color: var(--label2);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.chip.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+.patient-card {
+  margin: 0 16px 10px;
+  background: var(--bg2);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  padding: 14px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.1s, box-shadow 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.patient-card:active { transform: scale(0.98); box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+
+.avatar {
+  width: 46px; height: 46px;
+  border-radius: 23px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px; color: #fff;
+  flex-shrink: 0;
+}
+.pc-info { flex: 1; min-width: 0; }
+.pc-name { font-size: 15px; font-weight: 600; color: var(--label); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-dx   { font-size: 12px; color: var(--label3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-scores { display: flex; gap: 6px; margin-top: 6px; }
+.score-dot {
+  font-size: 11px; font-weight: 600;
+  padding: 2px 8px; border-radius: 8px;
+}
+.sd-a { background: #d5f5e3; color: #1e8449; }
+.sd-b { background: #d6eaf8; color: #1a5276; }
+.sd-c { background: #fef9e7; color: #9a7d0a; }
+.sd-d { background: #fde8e8; color: #c0392b; }
+
+.pc-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.big-score { font-size: 22px; font-weight: 800; }
+.gift-tag  { font-size: 10px; font-weight: 600; background: #fff9e0; color: #b8860b; border-radius: 6px; padding: 2px 7px; border: 1px solid #ffe066; }
+.chevron   { font-size: 12px; color: var(--label3); }
+
+/* trend mini spark */
+.spark { display: flex; align-items: flex-end; gap: 2px; height: 18px; }
+.spark-bar { width: 6px; border-radius: 2px; }
+
+/* ── DETAIL SCREEN ── */
+.detail-hero {
+  padding: 20px 16px 16px;
+  background: linear-gradient(145deg, #1a5276, #2e86c1);
+  color: #fff;
+}
+.dh-back {
+  font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.85);
+  background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+  margin-bottom: 12px; padding: 0;
+}
+.dh-name { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+.dh-meta { font-size: 13px; opacity: 0.8; margin-top: 3px; }
+.dh-score-row { display: flex; gap: 8px; margin-top: 14px; }
+.dh-score-pill {
+  flex: 1; background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 10px; padding: 10px 8px;
+  text-align: center;
+}
+.dsp-label { font-size: 10px; opacity: 0.75; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.dsp-value { font-size: 22px; font-weight: 800; margin-top: 2px; }
+.dsp-trend { font-size: 11px; opacity: 0.8; margin-top: 1px; }
+
+/* gift card eligibility banner */
+.gift-banner {
+  margin: 12px 16px;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.gb-eligible { background: #eafaf1; border: 1.5px solid #27ae60; }
+.gb-needs    { background: #fff9e0; border: 1.5px solid #f39c12; }
+.gb-icon     { font-size: 28px; flex-shrink: 0; }
+.gb-text h4  { font-size: 14px; font-weight: 700; color: var(--label); }
+.gb-text p   { font-size: 12px; color: var(--label3); margin-top: 2px; line-height: 1.4; }
+
+/* metric breakdown cards */
+.metric-cards { margin: 0 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+.metric-card  {
+  background: var(--bg2);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  padding: 14px 16px;
+}
+.mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.mc-title  { font-size: 14px; font-weight: 600; color: var(--label); display: flex; align-items: center; gap: 6px; }
+.mc-pct    { font-size: 15px; font-weight: 700; }
+
+.progress-track {
+  height: 8px; background: var(--fill); border-radius: 4px;
+  overflow: hidden; margin-bottom: 6px;
+}
+.progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+
+.mc-checkpoints { display: flex; gap: 8px; margin-top: 10px; }
+.mc-cp {
+  flex: 1; background: var(--bg3); border-radius: 8px;
+  padding: 7px 8px; text-align: center;
+}
+.mc-cp-label { font-size: 10px; color: var(--label3); font-weight: 500; }
+.mc-cp-val   { font-size: 15px; font-weight: 700; margin-top: 2px; }
+.mc-cp-note  { font-size: 10px; color: var(--label3); margin-top: 2px; line-height: 1.3; }
+
+/* chart card */
+.chart-card {
+  margin: 0 16px 16px;
+  background: var(--bg2);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  padding: 16px;
+}
+.chart-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--label); }
+.chart-wrap  { position: relative; height: 180px; }
+
+/* ── GIFT CARDS SCREEN ── */
+.gift-header {
+  margin: 12px 16px 4px;
+  background: linear-gradient(135deg, #b8860b, #FFD60A);
+  border-radius: 16px;
+  padding: 18px 20px;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(184,134,11,0.35);
+}
+.gh-icon  { font-size: 36px; }
+.gh-title { font-size: 20px; font-weight: 700; margin-top: 6px; }
+.gh-sub   { font-size: 13px; opacity: 0.85; margin-top: 3px; }
+.gh-rule  {
+  margin-top: 12px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.gift-patient-card {
+  margin: 0 16px 10px;
+  background: var(--bg2);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.gpc-info   { flex: 1; }
+.gpc-name   { font-size: 15px; font-weight: 600; }
+.gpc-reason { font-size: 12px; color: var(--label3); margin-top: 2px; }
+.gpc-tags   { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.gpc-tag    { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 8px; background: #eafaf1; color: #1e8449; border: 1px solid #a9dfbf; }
+.gift-icon-lg { font-size: 28px; flex-shrink: 0; }
+
+/* ── Animations ── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.screen.active > * { animation: fadeSlideUp 0.25s ease both; }
+
+/* ── Misc ── */
+.spacer-bottom { height: 8px; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- Nav Bar -->
+  <div class="nav-bar">
+    <div class="nav-inner">
+      <div>
+        <div class="nav-title" id="nav-title">HealthTrack</div>
+        <div class="nav-subtitle" id="nav-subtitle">Community Care Health Network</div>
+      </div>
+      <button class="nav-action" id="nav-action-btn" title="Search">🔔</button>
+    </div>
+  </div>
+
+  <!-- Screens -->
+  <div class="screens">
+
+    <!-- HOME -->
+    <div class="screen active" id="screen-home">
+      <div class="hero-banner">
+        <div class="hero-org">Community Care Health Network</div>
+        <div class="hero-title">Wellness Progress Initiative</div>
+        <div class="hero-sub">Provider Dashboard · May 2026</div>
+        <div class="hero-gift">🎁 $25 Safeway Gift Card Program Active</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-tile blue">
+          <div class="st-icon">👥</div>
+          <div class="st-value" id="h-total">8</div>
+          <div class="st-label">Total Patients</div>
+        </div>
+        <div class="stat-tile green">
+          <div class="st-icon">📈</div>
+          <div class="st-value" id="h-avg">72%</div>
+          <div class="st-label">Avg Score at 6mo</div>
+        </div>
+        <div class="stat-tile gold">
+          <div class="st-icon">🎁</div>
+          <div class="st-value" id="h-eligible">—</div>
+          <div class="st-label">Gift Card Eligible</div>
+        </div>
+        <div class="stat-tile orange">
+          <div class="st-icon">⚠️</div>
+          <div class="st-value" id="h-needs">—</div>
+          <div class="st-label">Need Support</div>
+        </div>
+      </div>
+
+      <div class="section-header">Health Score Weights</div>
+      <div class="weight-card card" style="margin:0 16px 16px; padding:14px 16px;">
+        <div class="weight-bar-track">
+          <div class="w-seg-m" style="width:35%;background:#007AFF;"></div>
+          <div class="w-seg-m" style="width:25%;background:#34C759;"></div>
+          <div class="w-seg-m" style="width:25%;background:#AF52DE;"></div>
+          <div class="w-seg-m" style="width:15%;background:#FF9500;"></div>
+        </div>
+        <div class="weight-labels">
+          <div class="w-lbl-item"><div class="w-dot" style="background:#007AFF;"></div>Lab Results 35%</div>
+          <div class="w-lbl-item"><div class="w-dot" style="background:#34C759;"></div>Steps 25%</div>
+          <div class="w-lbl-item"><div class="w-dot" style="background:#AF52DE;"></div>Diet 25%</div>
+          <div class="w-lbl-item"><div class="w-dot" style="background:#FF9500;"></div>Oral Hygiene 15%</div>
+        </div>
+      </div>
+
+      <div class="section-header">Top Performers at 6 Months</div>
+      <div id="home-top-list"></div>
+
+      <div class="section-header">Need Attention</div>
+      <div id="home-needs-list"></div>
+      <div class="spacer-bottom"></div>
+    </div>
+
+    <!-- PATIENTS -->
+    <div class="screen" id="screen-patients">
+      <div class="search-bar">
+        <input class="search-input" type="search" id="patient-search" placeholder="Search patients…" autocomplete="off">
+      </div>
+      <div class="filter-chips">
+        <div class="chip active" data-filter="all">All</div>
+        <div class="chip" data-filter="eligible">🎁 Gift Card Eligible</div>
+        <div class="chip" data-filter="improving">📈 Improving</div>
+        <div class="chip" data-filter="needs">⚠️ Needs Support</div>
+      </div>
+      <div class="section-header" id="patients-count-label"></div>
+      <div id="patient-list"></div>
+      <div class="spacer-bottom"></div>
+    </div>
+
+    <!-- DETAIL -->
+    <div class="screen" id="screen-detail">
+      <div class="detail-hero" id="d-hero">
+        <button class="dh-back" id="d-back">‹ Patients</button>
+        <div class="dh-name"  id="d-name"></div>
+        <div class="dh-meta"  id="d-meta"></div>
+        <div class="dh-score-row" id="d-score-row"></div>
+      </div>
+      <div id="d-gift-banner"></div>
+      <div class="section-header">Progress by Metric</div>
+      <div class="metric-cards" id="d-metrics"></div>
+      <div class="chart-card">
+        <div class="chart-title">📈 Score Progression</div>
+        <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+      </div>
+      <div class="chart-card" style="margin-bottom:16px;">
+        <div class="chart-title">📊 6-Month Breakdown</div>
+        <div class="chart-wrap"><canvas id="radarChart"></canvas></div>
+      </div>
+      <div class="spacer-bottom"></div>
+    </div>
+
+    <!-- GIFT CARDS -->
+    <div class="screen" id="screen-gifts">
+      <div class="gift-header">
+        <div class="gh-icon">🎁</div>
+        <div class="gh-title">Safeway Gift Cards</div>
+        <div class="gh-sub">$25 reward for qualifying patients</div>
+        <div class="gh-rule">✅ Eligible if: Score ≥ 70% at checkpoint <em>or</em> improvement ≥ 12 pts from prior</div>
+      </div>
+      <div class="section-header">Eligible Patients</div>
+      <div id="gift-list"></div>
+      <div class="section-header">Not Yet Eligible</div>
+      <div id="not-gift-list"></div>
+      <div class="spacer-bottom"></div>
+    </div>
+
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-item active" data-tab="home">
+      <div class="tab-icon-wrap">
+        <span class="tab-icon">🏠</span>
+      </div>
+      <span class="tab-label">Home</span>
+    </button>
+    <button class="tab-item" data-tab="patients">
+      <div class="tab-icon-wrap">
+        <span class="tab-icon">👥</span>
+        <span class="tab-badge" id="patients-badge" style="display:none;"></span>
+      </div>
+      <span class="tab-label">Patients</span>
+    </button>
+    <button class="tab-item" data-tab="gifts">
+      <div class="tab-icon-wrap">
+        <span class="tab-icon">🎁</span>
+        <span class="tab-badge" id="gift-badge" style="display:none;"></span>
+      </div>
+      <span class="tab-label">Gift Cards</span>
+    </button>
+  </div>
+
+</div>
+
+<script>
+// ── Data ─────────────────────────────────────────────────────────────────────
+const W = { labs:0.35, steps:0.25, diet:0.25, oral:0.15 };
+const COLORS = ['#007AFF','#34C759','#AF52DE','#FF9500','#FF3B30','#32ADE6','#FF6B6B','#5856D6'];
+
+const patients = [
+  { id:'PT-001', name:'Maria Santos',    age:52, sex:'F', color:'#FF6B6B',
+    dx:'Type 2 Diabetes, Hypertension',
+    checkpoints: {
+      baseline: { labs:48, steps:40, diet:42, oral:55,  labNote:'HbA1c 7.2%, LDL 138', stepsNote:'~3,800 steps/day', dietNote:'High processed food', oralNote:'Brushes once/day' },
+      '3mo':    { labs:62, steps:61, diet:63, oral:72,  labNote:'HbA1c 6.8%, LDL 121', stepsNote:'~6,100 steps/day', dietNote:'Reduced soda, more veg', oralNote:'Brushes 2×/day' },
+      '6mo':    { labs:74, steps:76, diet:75, oral:85,  labNote:'HbA1c 6.3%, LDL 108', stepsNote:'~7,600 steps/day', dietNote:'Meal prepping, low-glycemic', oralNote:'Daily brushing & flossing' },
+    }},
+  { id:'PT-002', name:'James Liu',       age:44, sex:'M', color:'#007AFF',
+    dx:'Hyperlipidemia, Pre-diabetes',
+    checkpoints: {
+      baseline: { labs:55, steps:52, diet:50, oral:60,  labNote:'HbA1c 6.1%, LDL 145', stepsNote:'~5,200 steps/day', dietNote:'Frequent fast food', oralNote:'Brushes once/day' },
+      '3mo':    { labs:63, steps:66, diet:68, oral:70,  labNote:'HbA1c 5.9%, LDL 130', stepsNote:'~6,600 steps/day', dietNote:'Cooking at home 4×/wk', oralNote:'Brushes 2×/day + mouthwash' },
+      '6mo':    { labs:72, steps:80, diet:79, oral:80,  labNote:'HbA1c 5.7%, LDL 115', stepsNote:'~8,000 steps/day', dietNote:'Mediterranean-style diet', oralNote:'Brushes 2×/day, flosses 5×/wk' },
+    }},
+  { id:'PT-003', name:'Aisha Johnson',   age:38, sex:'F', color:'#34C759',
+    dx:'Obesity, Elevated CRP',
+    checkpoints: {
+      baseline: { labs:50, steps:35, diet:38, oral:45,  labNote:'CRP 4.2, LDL 142', stepsNote:'~3,500 steps/day', dietNote:'Irregular meals, high sugar', oralNote:'Brushes irregularly' },
+      '3mo':    { labs:68, steps:65, diet:70, oral:62,  labNote:'CRP 2.8, LDL 128', stepsNote:'~6,500 steps/day', dietNote:'3 structured meals/day', oralNote:'Brushes daily' },
+      '6mo':    { labs:82, steps:88, diet:85, oral:78,  labNote:'CRP 1.4, LDL 109', stepsNote:'~8,800 steps/day', dietNote:'Whole foods, limited processed', oralNote:'Brushes 2×/day, improving floss' },
+    }},
+  { id:'PT-004', name:'Robert Kim',      age:61, sex:'M', color:'#FF9500',
+    dx:'Hypertension, CKD Stage 2',
+    checkpoints: {
+      baseline: { labs:42, steps:30, diet:44, oral:50,  labNote:'BP 148/92, Creat 1.4', stepsNote:'~3,000 steps/day', dietNote:'High sodium diet', oralNote:'Brushes once/day' },
+      '3mo':    { labs:50, steps:42, diet:53, oral:58,  labNote:'BP 140/88, Creat 1.3', stepsNote:'~4,200 steps/day', dietNote:'Reducing sodium, more fruit', oralNote:'Brushes 2×/day' },
+      '6mo':    { labs:55, steps:48, diet:60, oral:62,  labNote:'BP 135/84, Creat 1.2', stepsNote:'~4,800 steps/day', dietNote:'DASH diet, partial compliance', oralNote:'Brushes 2×/day, mouthwash' },
+    }},
+  { id:'PT-005', name:'Elena Rodriguez', age:47, sex:'F', color:'#AF52DE',
+    dx:'Hypothyroidism, Anemia',
+    checkpoints: {
+      baseline: { labs:52, steps:45, diet:58, oral:65,  labNote:'TSH 6.2, Hgb 10.8', stepsNote:'~4,500 steps/day', dietNote:'Low iron foods', oralNote:'Brushes 2×/day, occ floss' },
+      '3mo':    { labs:66, steps:60, diet:72, oral:75,  labNote:'TSH 3.8, Hgb 12.1', stepsNote:'~6,000 steps/day', dietNote:'Iron-rich foods added', oralNote:'Brushes 2×/day, floss 3×/wk' },
+      '6mo':    { labs:78, steps:73, diet:80, oral:85,  labNote:'TSH 2.6, Hgb 13.2', stepsNote:'~7,300 steps/day', dietNote:'Balanced, cooking at home', oralNote:'Daily brushing & flossing' },
+    }},
+  { id:'PT-006', name:'David Chen',      age:55, sex:'M', color:'#32ADE6',
+    dx:'Metabolic Syndrome',
+    checkpoints: {
+      baseline: { labs:46, steps:38, diet:40, oral:48,  labNote:'Trig 220, Glucose 108', stepsNote:'~3,800 steps/day', dietNote:'High carb, low fiber', oralNote:'Brushes once/day' },
+      '3mo':    { labs:58, steps:55, diet:60, oral:65,  labNote:'Trig 175, Glucose 101', stepsNote:'~5,500 steps/day', dietNote:'Reducing carbs, adding fiber', oralNote:'Brushes 2×/day' },
+      '6mo':    { labs:68, steps:67, diet:72, oral:75,  labNote:'Trig 145, Glucose 96',  stepsNote:'~6,700 steps/day', dietNote:'Low-carb structured eating', oralNote:'Brushes 2×/day, floss 4×/wk' },
+    }},
+  { id:'PT-007', name:'Priya Nair',      age:34, sex:'F', color:'#5856D6',
+    dx:'PCOS, Vitamin D Deficiency',
+    checkpoints: {
+      baseline: { labs:54, steps:48, diet:55, oral:70,  labNote:'Vit D 14 ng/mL, HbA1c 5.8%', stepsNote:'~4,800 steps/day', dietNote:'Inconsistent eating', oralNote:'Good oral habits' },
+      '3mo':    { labs:70, steps:72, diet:74, oral:82,  labNote:'Vit D 28 ng/mL, HbA1c 5.6%', stepsNote:'~7,200 steps/day', dietNote:'Anti-inflammatory diet', oralNote:'Excellent oral care' },
+      '6mo':    { labs:84, steps:88, diet:87, oral:90,  labNote:'Vit D 42 ng/mL, HbA1c 5.4%', stepsNote:'~8,800 steps/day', dietNote:'Whole food, plant-rich', oralNote:'Exemplary oral hygiene' },
+    }},
+  { id:'PT-008', name:'Marcus Thompson', age:58, sex:'M', color:'#FF3B30',
+    dx:'Coronary Artery Disease Risk',
+    checkpoints: {
+      baseline: { labs:40, steps:28, diet:35, oral:42,  labNote:'LDL 165, hs-CRP 5.1', stepsNote:'~2,800 steps/day', dietNote:'High sat fat, smoking', oralNote:'Poor brushing habits' },
+      '3mo':    { labs:47, steps:38, diet:44, oral:52,  labNote:'LDL 152, hs-CRP 4.2', stepsNote:'~3,800 steps/day', dietNote:'Reduced red meat, quit smoking', oralNote:'Brushes daily now' },
+      '6mo':    { labs:56, steps:50, diet:58, oral:62,  labNote:'LDL 138, hs-CRP 2.9', stepsNote:'~5,000 steps/day', dietNote:'Heart-healthy diet', oralNote:'Brushes 2×/day' },
+    }},
+];
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const W_SCORE = m => Math.round(m.labs*W.labs + m.steps*W.steps + m.diet*W.diet + m.oral*W.oral);
+const getScores = p => ['baseline','3mo','6mo'].map(k => W_SCORE(p.checkpoints[k]));
+
+function giftEligible(p) {
+  const [b,m3,m6] = getScores(p);
+  const r = [];
+  if (m3>=70||(m3-b)>=12) r.push('3-Month');
+  if (m6>=70||(m6-m3)>=12) r.push('6-Month');
+  return r;
+}
+
+function scoreColor(s) {
+  if (s>=75) return '#1e8449';
+  if (s>=60) return '#1a5276';
+  if (s>=50) return '#9a7d0a';
+  return '#c0392b';
+}
+function scoreBg(s) {
+  if (s>=75) return '#d5f5e3';
+  if (s>=60) return '#d6eaf8';
+  if (s>=50) return '#fef9e7';
+  return '#fde8e8';
+}
+function scoreClass(s) {
+  if (s>=75) return 'sd-a';
+  if (s>=60) return 'sd-b';
+  if (s>=50) return 'sd-c';
+  return 'sd-d';
+}
+function initials(name) { return name.split(' ').map(w=>w[0]).join('').slice(0,2); }
+
+const METRIC_META = {
+  labs:  { label:'Lab Results',    icon:'🔬', color:'#007AFF', weight:'35%' },
+  steps: { label:'Daily Step Count',icon:'👣', color:'#34C759', weight:'25%' },
+  diet:  { label:'Diet & Food Habits',icon:'🥗', color:'#AF52DE', weight:'25%' },
+  oral:  { label:'Oral Hygiene',   icon:'🦷', color:'#FF9500', weight:'15%' },
+};
+const NOTE_KEYS = { labs:'labNote', steps:'stepsNote', diet:'dietNote', oral:'oralNote' };
+
+// ── Tab navigation ────────────────────────────────────────────────────────────
+let currentTab = 'home';
+let currentPatient = null;
+let lineChartInst = null, radarChartInst = null;
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+  document.querySelectorAll('.screen').forEach(el => {
+    el.classList.toggle('active', el.id === `screen-${tab}`);
+    if (el.classList.contains('active')) el.scrollTop = 0;
+  });
+  currentTab = tab;
+
+  const titles = { home:'HealthTrack', patients:'Patients', gifts:'Gift Cards', detail: currentPatient?.name || '' };
+  const subs   = { home:'Community Care Health Network', patients:'Tap a patient to view details', gifts:'$25 Safeway Reward Program', detail: currentPatient?.dx || '' };
+  document.getElementById('nav-title').textContent    = titles[tab] || 'HealthTrack';
+  document.getElementById('nav-subtitle').textContent = subs[tab]   || '';
+}
+
+document.querySelectorAll('.tab-item').forEach(btn => {
+  btn.addEventListener('click', () => showTab(btn.dataset.tab));
+});
+
+// ── Build home ────────────────────────────────────────────────────────────────
+function buildHome() {
+  const scores6 = patients.map(p => getScores(p)[2]);
+  const avg6 = Math.round(scores6.reduce((a,b)=>a+b,0)/scores6.length);
+  const eligible = patients.filter(p => giftEligible(p).length>0).length;
+  const needs = patients.filter(p => getScores(p)[2] < 55).length;
+  document.getElementById('h-total').textContent    = patients.length;
+  document.getElementById('h-avg').textContent      = avg6+'%';
+  document.getElementById('h-eligible').textContent = eligible;
+  document.getElementById('h-needs').textContent    = needs;
+  document.getElementById('gift-badge').textContent = eligible;
+  document.getElementById('gift-badge').style.display = eligible ? 'block' : 'none';
+  document.getElementById('patients-badge').textContent = patients.length;
+  document.getElementById('patients-badge').style.display = 'block';
+
+  // Top performers (6mo ≥ 75)
+  const top = [...patients].sort((a,b)=>getScores(b)[2]-getScores(a)[2]).slice(0,3);
+  document.getElementById('home-top-list').innerHTML = top.map(p => miniCard(p)).join('');
+
+  // Needs attention (6mo < 60)
+  const need = patients.filter(p=>getScores(p)[2]<60).sort((a,b)=>getScores(a)[2]-getScores(b)[2]);
+  const el = document.getElementById('home-needs-list');
+  el.innerHTML = need.length ? need.map(p=>miniCard(p)).join('') : '<div style="padding:8px 16px;font-size:13px;color:#8e8e93;">All patients are on track 🎉</div>';
+}
+
+function miniCard(p) {
+  const [b,m3,m6] = getScores(p);
+  const diff = m6-b;
+  const trendIcon = diff>=10?'▲':diff<=-5?'▼':'→';
+  const trendColor = diff>=10?'#27ae60':diff<=-5?'#e74c3c':'#8e8e93';
+  return `<div class="patient-card" onclick="openDetail('${p.id}')">
+    <div class="avatar" style="background:${p.color};">${initials(p.name)}</div>
+    <div class="pc-info">
+      <div class="pc-name">${p.name}</div>
+      <div class="pc-dx">${p.dx}</div>
+    </div>
+    <div class="pc-right">
+      <div class="big-score" style="color:${scoreColor(m6)};">${m6}%</div>
+      <div style="font-size:12px;color:${trendColor};font-weight:600;">${trendIcon} ${diff>=0?'+':''}${diff}</div>
+    </div>
+  </div>`;
+}
+
+// ── Build patient list ────────────────────────────────────────────────────────
+let currentFilter = 'all';
+
+function buildPatientList(query='') {
+  let filtered = patients.filter(p => {
+    if (query && !p.name.toLowerCase().includes(query.toLowerCase())) return false;
+    if (currentFilter==='eligible') return giftEligible(p).length>0;
+    if (currentFilter==='improving') { const [b,,m6]=getScores(p); return m6-b>=10; }
+    if (currentFilter==='needs')     return getScores(p)[2]<60;
+    return true;
+  });
+
+  document.getElementById('patients-count-label').textContent = `${filtered.length} patient${filtered.length!==1?'s':''}`;
+
+  document.getElementById('patient-list').innerHTML = filtered.map(p => {
+    const [b,m3,m6] = getScores(p);
+    const diff = m6-b;
+    const trendIcon = diff>=10?'📈':diff<=-5?'📉':'➡️';
+    const eligible = giftEligible(p);
+    return `<div class="patient-card" onclick="openDetail('${p.id}')">
+      <div class="avatar" style="background:${p.color};">${initials(p.name)}</div>
+      <div class="pc-info">
+        <div class="pc-name">${p.name}</div>
+        <div class="pc-dx">${p.dx}</div>
+        <div class="pc-scores">
+          <span class="score-dot ${scoreClass(b)}">${b}%</span>
+          <span style="font-size:11px;color:#8e8e93;align-self:center;">→</span>
+          <span class="score-dot ${scoreClass(m3)}">${m3}%</span>
+          <span style="font-size:11px;color:#8e8e93;align-self:center;">→</span>
+          <span class="score-dot ${scoreClass(m6)}">${m6}%</span>
+          ${eligible.length?'<span class="score-dot" style="background:#fff9e0;color:#b8860b;border:1px solid #ffe066;">🎁</span>':''}
+        </div>
+      </div>
+      <div class="pc-right">
+        <div class="big-score" style="color:${scoreColor(m6)};">${m6}%</div>
+        <div style="font-size:13px;">${trendIcon}</div>
+        <div style="font-size:10px;color:#8e8e93;">${p.id}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    currentFilter = chip.dataset.filter;
+    buildPatientList(document.getElementById('patient-search').value);
+  });
+});
+
+document.getElementById('patient-search').addEventListener('input', e => {
+  buildPatientList(e.target.value);
+});
+
+// ── Open patient detail ───────────────────────────────────────────────────────
+function openDetail(id) {
+  currentPatient = patients.find(p=>p.id===id);
+  const p = currentPatient;
+  const [b,m3,m6] = getScores(p);
+
+  // Hero
+  document.getElementById('d-name').textContent = p.name;
+  document.getElementById('d-meta').textContent = `${p.id} · Age ${p.age} · ${p.sex==='M'?'Male':'Female'} · ${p.dx}`;
+
+  document.getElementById('d-score-row').innerHTML = [
+    ['Baseline', b, ''],
+    ['3 Months', m3, (m3-b>=0?'+':'')+(m3-b)+' pts'],
+    ['6 Months', m6, (m6-m3>=0?'+':'')+(m6-m3)+' pts'],
+  ].map(([label,score,trend]) => `
+    <div class="dh-score-pill">
+      <div class="dsp-label">${label}</div>
+      <div class="dsp-value">${score}%</div>
+      <div class="dsp-trend">${trend||'baseline'}</div>
+    </div>`).join('');
+
+  // Gift banner
+  const eligible = giftEligible(p);
+  document.getElementById('d-gift-banner').innerHTML = eligible.length
+    ? `<div class="gift-banner gb-eligible">
+        <div class="gb-icon">🎁</div>
+        <div class="gb-text"><h4>Eligible: ${eligible.join(' & ')}</h4><p>Score ≥ 70% or ≥ 12-point improvement met. Award $25 Safeway gift card.</p></div>
+       </div>`
+    : `<div class="gift-banner gb-needs">
+        <div class="gb-icon">📋</div>
+        <div class="gb-text"><h4>Not Yet Eligible</h4><p>Needs score ≥ 70% or ≥ 12-pt improvement at next checkpoint. Keep coaching!</p></div>
+       </div>`;
+
+  // Metric cards
+  document.getElementById('d-metrics').innerHTML = ['labs','steps','diet','oral'].map(key => {
+    const meta = METRIC_META[key];
+    const vals = ['baseline','3mo','6mo'].map(k=>p.checkpoints[k][key]);
+    const notes = ['baseline','3mo','6mo'].map(k=>p.checkpoints[k][NOTE_KEYS[key]]);
+    const cur = vals[2];
+    return `<div class="metric-card">
+      <div class="mc-header">
+        <div class="mc-title">${meta.icon} ${meta.label} <span style="font-size:11px;color:#8e8e93;font-weight:400;">(${meta.weight})</span></div>
+        <div class="mc-pct" style="color:${meta.color};">${cur}%</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${cur}%;background:${meta.color};"></div></div>
+      <div class="mc-checkpoints">
+        ${['Baseline','3 Mo','6 Mo'].map((lbl,i)=>`
+          <div class="mc-cp">
+            <div class="mc-cp-label">${lbl}</div>
+            <div class="mc-cp-val" style="color:${meta.color};">${vals[i]}%</div>
+            <div class="mc-cp-note">${notes[i]}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Charts
+  if (lineChartInst) lineChartInst.destroy();
+  const lc = document.getElementById('lineChart').getContext('2d');
+  lineChartInst = new Chart(lc, {
+    type: 'line',
+    data: {
+      labels: ['Baseline','3 Months','6 Months'],
+      datasets: [
+        { label:'Overall', data:[b,m3,m6], borderColor:'#1a5276', backgroundColor:'rgba(26,82,118,0.08)', tension:.4, pointRadius:5, fill:true, borderWidth:2.5 },
+        ...['labs','steps','diet','oral'].map(key => ({
+          label: METRIC_META[key].label,
+          data: ['baseline','3mo','6mo'].map(k=>p.checkpoints[k][key]),
+          borderColor: METRIC_META[key].color,
+          borderDash:[5,3], tension:.4, pointRadius:3, borderWidth:1.5, fill:false
+        }))
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: { legend:{ position:'bottom', labels:{ font:{size:10}, boxWidth:10, padding:8 }}},
+      scales: { y:{ min:0, max:100, ticks:{ callback:v=>v+'%', font:{size:10} }, grid:{color:'rgba(0,0,0,0.04)'} }}
+    }
+  });
+
+  if (radarChartInst) radarChartInst.destroy();
+  const rc = document.getElementById('radarChart').getContext('2d');
+  radarChartInst = new Chart(rc, {
+    type:'radar',
+    data:{
+      labels:['Labs','Steps','Diet','Oral'],
+      datasets:[
+        { label:'6-Month', data:['labs','steps','diet','oral'].map(k=>p.checkpoints['6mo'][k]),
+          backgroundColor:'rgba(26,82,118,0.12)', borderColor:'#1a5276',
+          pointBackgroundColor:['#007AFF','#34C759','#AF52DE','#FF9500'],
+          pointRadius:5, borderWidth:2 },
+        { label:'Baseline', data:['labs','steps','diet','oral'].map(k=>p.checkpoints['baseline'][k]),
+          backgroundColor:'rgba(180,180,180,0.06)', borderColor:'#c6c6c8',
+          pointBackgroundColor:'#c6c6c8', pointRadius:3, borderWidth:1.5, borderDash:[4,3] }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'bottom', labels:{ font:{size:10}, boxWidth:10, padding:8 }}},
+      scales:{ r:{ min:0, max:100, ticks:{ stepSize:25, font:{size:9} }, pointLabels:{ font:{size:11} }}}
+    }
+  });
+
+  showTab('detail');
+  document.getElementById('nav-title').textContent    = p.name;
+  document.getElementById('nav-subtitle').textContent = p.dx;
+}
+
+document.getElementById('d-back').addEventListener('click', () => {
+  showTab('patients');
+});
+
+// ── Build gift card screen ────────────────────────────────────────────────────
+function buildGifts() {
+  const eligible   = patients.filter(p=>giftEligible(p).length>0);
+  const notEligible = patients.filter(p=>giftEligible(p).length===0);
+
+  document.getElementById('gift-list').innerHTML = eligible.map(p=>{
+    const reasons = giftEligible(p);
+    const [,,m6] = getScores(p);
+    return `<div class="gift-patient-card">
+      <div class="gift-icon-lg">🎁</div>
+      <div class="gpc-info">
+        <div class="gpc-name">${p.name}</div>
+        <div class="gpc-reason">${p.id} · Score: ${m6}%</div>
+        <div class="gpc-tags">${reasons.map(r=>`<span class="gpc-tag">✓ ${r}</span>`).join('')}</div>
+      </div>
+      <div class="avatar" style="background:${p.color};width:36px;height:36px;font-size:13px;border-radius:18px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">${initials(p.name)}</div>
+    </div>`;
+  }).join('') || '<div style="padding:8px 16px;font-size:13px;color:#8e8e93;">No patients eligible yet</div>';
+
+  document.getElementById('not-gift-list').innerHTML = notEligible.map(p=>{
+    const [,,m6] = getScores(p);
+    const needed = Math.max(0, 70-m6);
+    return `<div class="gift-patient-card" style="opacity:0.7;">
+      <div class="gift-icon-lg" style="opacity:0.4;">🎁</div>
+      <div class="gpc-info">
+        <div class="gpc-name">${p.name}</div>
+        <div class="gpc-reason">${p.id} · Score: ${m6}% — needs ${needed} more pts or ≥12pt jump</div>
+      </div>
+      <div class="avatar" style="background:${p.color};width:36px;height:36px;font-size:13px;border-radius:18px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">${initials(p.name)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildHome();
+buildPatientList();
+buildGifts();
+</script>
+</body>
 </html>
