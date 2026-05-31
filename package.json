@@ -4,24 +4,31 @@
   "main": "expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "eslint .",
     "format": "prettier --write '**/*.{ts,tsx,js,json}'"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~56.0.13",
+    "@kingstinct/react-native-healthkit": "^14.0.1",
+    "babel-preset-expo": "^56.0.14",
     "expo": "~56.0.0",
+    "expo-dev-client": "~56.0.18",
     "expo-status-bar": "~2.0.0",
-    "react": "19.0.0",
-    "react-native": "0.79.2"
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "react-native": "0.79.2",
+    "react-native-nitro-modules": "^0.35.9",
+    "react-native-web": "~0.21.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",
     "@types/react": "~19.0.0",
     "eslint": "^9.0.0",
     "prettier": "^3.4.0",
-    "typescript": "~5.7.0"
+    "typescript": "~6.0.3"
   },
   "private": true
 }
