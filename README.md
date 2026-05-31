@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WellPath — Patient Health App Mockup
 
-## Getting Started
+A Next.js mobile app UI mockup for a patient wellness program. Designed for screenshot handoff to app developers.
 
-First, run the development server:
+## Features
+
+- **Home screen** — daily check-in dashboard with score, completion rate, and $25 milestone rewards (months 1, 3, 6)
+- **Oral Health** — 4 daily questions with hidden point-based scoring (out of 100, 15% daily weight)
+- **Food & Diet** — meal photo upload with mock AI agent nutrition analysis (calories, macros, diet score at 35% daily weight)
+- **Step Counts & Lab Data** — home cards (detail screens not yet implemented)
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the phone mockup.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- [Next.js 16](https://nextjs.org/)
+- [React 19](https://react.dev/)
+- [Tailwind CSS 4](https://tailwindcss.com/)
+- TypeScript
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+  app-mockup.tsx           # Main client component (screens & navigation)
+  oral-health-questions.ts # Oral health questions & scoring logic
+  page.tsx                 # Entry point
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scoring overview
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Section      | Daily weight | Input                        |
+|-------------|--------------|------------------------------|
+| Steps       | 30%          | Phone/wearable or manual     |
+| Food & Diet | 35%          | Meal photo → AI analysis     |
+| Oral Health | 15%          | 4 daily questions            |
+| Lab Results | Review only  | Provider entry every 3 mo.   |
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Reward eligibility: $25 at months 1, 3, and 6 based on monthly score, completion rate, and lab results.
