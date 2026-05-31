@@ -27,7 +27,7 @@ export function AuthPage() {
   }
 
   return (
-    <div className="min-h-[100dvh] flex flex-col overflow-hidden">
+    <div className="min-h-[100vh] flex flex-col overflow-hidden">
       {/* Top notch spacer */}
       <div className="h-[env(safe-area-inset-top,0px)]" />
 

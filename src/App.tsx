@@ -13,6 +13,10 @@ import { CameraScreen } from './features/food/screens/CameraScreen'
 import { PortionSelectScreen } from './features/food/screens/PortionSelectScreen'
 import { ManualFoodSearchScreen } from './features/food/screens/ManualFoodSearchScreen'
 import { MealSummaryScreen } from './features/food/screens/MealSummaryScreen'
+import { WellPathHomePage } from './pages/WellPathHomePage'
+import { WellPathOralHealthPage } from './pages/WellPathOralHealthPage'
+import { WellPathFoodDietPage } from './pages/WellPathFoodDietPage'
+import { AdminPage } from './pages/AdminPage'
 
 // ── Layout route shell for tab pages ──────────────────────────────
 
@@ -33,7 +37,7 @@ function AuthenticatedApp() {
     <Routes>
       {/* All pages inside AppLayout with header + nav */}
       <Route element={<AppShell />}>
-        <Route index element={<DashboardPage state={state} actions={actions} />} />
+        <Route index element={<WellPathHomePage />} />
         <Route path="steps" element={<StepsPage state={state} actions={actions} />} />
         <Route path="heart" element={<HeartPage state={state} actions={actions} />} />
         <Route path="activity" element={<ActivityPage state={state} actions={actions} />} />
@@ -44,6 +48,9 @@ function AuthenticatedApp() {
           <Route path="manual-search" element={<ManualFoodSearchScreen />} />
           <Route path="meal-summary" element={<MealSummaryScreen />} />
         </Route>
+        <Route path="oral-health" element={<WellPathOralHealthPage />} />
+        <Route path="food-diet" element={<WellPathFoodDietPage />} />
+        <Route path="admin" element={<AdminPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
@@ -58,7 +65,7 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="h-dvh flex items-center justify-center bg-[var(--color-bg)]">
+      <div className="h-screen flex items-center justify-center bg-[var(--color-bg)]">
         <div className="flex items-center gap-2.5">
           <span className="text-3xl">💚</span>
           <p className="text-sm text-[var(--color-text)]">Loading…</p>

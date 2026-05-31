@@ -3,11 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>applied-intelligence-hackathon</title>
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- ═══ PWA: iOS full-screen setup ═══ -->
+    <!-- viewport-fit=cover lets content extend behind rounded corners & home indicator -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
+    />
+    <!-- Enable standalone (full-screen) mode when added to Home Screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="AI Hackathon" />
+
+    <!--
+      Theme color for PWA chrome & safe-area background.
+      Initial value is set for light mode; a script below updates it
+      based on prefers-color-scheme so iOS always paints the correct
+      background behind the home indicator.
+    -->
+    <meta name="theme-color" content="#ffffff" />
+
+    <title>Applied Intelligence Hackathon</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root" class="h-screen w-full relative"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!--
+      Sync theme-color meta tag with prefers-color-scheme before first paint.
+      This prevents a white/grey flash behind the home indicator when the
+      system is in dark mode.
+    -->
+    <script>
+      (function () {
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (!meta) return;
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        meta.setAttribute('content', mq.matches ? '#16171d' : '#ffffff');
+        mq.addEventListener('change', function (e) {
+          meta.setAttribute('content', e.matches ? '#16171d' : '#ffffff');
+        });
+      })();
+    </script>
   </body>
 </html>

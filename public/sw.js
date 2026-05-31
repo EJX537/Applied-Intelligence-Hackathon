@@ -1,4 +1,4 @@
-const CACHE = "ai-hackathon-v1";
+const CACHE = "ai-hackathon-v3";
 
 const PRECACHE = [
   "/",
