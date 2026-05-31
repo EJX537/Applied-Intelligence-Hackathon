@@ -1,5 +1,4 @@
 import type { NutritionTotals } from '../types';
-import { colors } from '../constants/colors';
 import { NutrientBar } from './NutrientBar';
 
 interface Props {
@@ -12,58 +11,41 @@ export function DailySummary({ totals, targets }: Props) {
   const calPct = Math.min(100, Math.round(calRatio * 100));
 
   return (
-    <div
-      style={{
-        background: colors.card,
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 12,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+    <div className="bg-white rounded-2xl p-4 mb-3">
+      <div className="flex items-center gap-4">
         <div
           aria-label={`Calories: ${totals.calories} of ${targets.calories}`}
-          style={{
-            width: 110,
-            height: 110,
-            borderRadius: 55,
-            border: `6px solid ${colors.primary}`,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
+          className="w-[110px] h-[110px] rounded-full border-[6px] border-[#4CAF50] flex flex-col items-center justify-center shrink-0"
         >
-          <span style={{ fontSize: 22, fontWeight: 700, color: colors.text }}>
+          <span className="text-[22px] font-bold text-[#333333]">
             {totals.calories}
           </span>
-          <span style={{ fontSize: 11, color: colors.textLight }}>of {targets.calories}</span>
-          <span style={{ fontSize: 12, color: colors.primary, fontWeight: 600, marginTop: 2 }}>
+          <span className="text-[11px] text-[#666666]">of {targets.calories}</span>
+          <span className="text-xs text-[#4CAF50] font-semibold mt-0.5">
             {calPct}%
           </span>
         </div>
-        <div style={{ flex: 1 }}>
+        <div className="flex-1">
           <NutrientBar
             label="Protein"
             value={totals.protein_g}
             target={targets.protein_g}
             unit="g"
-            color={colors.primary}
+            color="#4CAF50"
           />
           <NutrientBar
             label="Carbs"
             value={totals.carbs_g}
             target={targets.carbs_g}
             unit="g"
-            color={colors.secondary}
+            color="#2196F3"
           />
           <NutrientBar
             label="Fat"
             value={totals.fat_g}
             target={targets.fat_g}
             unit="g"
-            color={colors.warning}
+            color="#FF9800"
           />
         </div>
       </div>

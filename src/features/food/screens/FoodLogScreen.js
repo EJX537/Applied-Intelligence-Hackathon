@@ -5,7 +5,6 @@ import { useFoodStore } from '../store/foodStore';
 import { useDailyNutrition } from '../hooks/useDailyNutrition';
 import { DailySummary } from '../components/DailySummary';
 import { MealCard } from '../components/MealCard';
-import { colors } from '../constants/colors';
 const DAILY_TARGETS = {
     calories: 2000,
     protein_g: 100,
@@ -43,35 +42,8 @@ export function FoodLogScreen() {
         else if (action === 'search')
             navigate('/manual-search', { state: { mealType: mt } });
     };
-    return (_jsxs("div", { className: "app-shell", children: [_jsx("div", { style: { fontSize: 14, color: colors.textLight, marginBottom: 12 }, children: todayLabel() }), _jsx(DailySummary, { totals: dailyTotals, targets: DAILY_TARGETS }), _jsx("div", { style: { fontSize: 15, fontWeight: 700, color: colors.text, marginBottom: 8 }, children: "Today's meals" }), meals.length === 0 ? (_jsx("div", { style: { color: colors.textLight, textAlign: 'center', marginTop: 32 }, children: "No meals logged today \u2014 tap + to start" })) : (_jsx("div", { style: { paddingBottom: 80 }, children: meals.map((m) => (_jsx(MealCard, { meal: m, onDelete: removeMeal }, m.id))) })), _jsx("button", { type: "button", onClick: () => setShowSheet(true), "aria-label": "Add a meal", style: {
-                    position: 'fixed',
-                    right: 'calc(50% - 312px)',
-                    bottom: 24,
-                    width: 56,
-                    height: 56,
-                    borderRadius: 28,
-                    background: colors.primary,
-                    color: '#fff',
-                    fontSize: 30,
-                    fontWeight: 300,
-                    border: 'none',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                }, children: "+" }), showSheet && (_jsx("div", { role: "dialog", "aria-label": "Add a meal", style: {
-                    position: 'fixed',
-                    inset: 0,
-                    background: 'rgba(0,0,0,0.4)',
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    justifyContent: 'center',
-                    zIndex: 10,
-                }, onClick: () => {
+    return (_jsxs("div", { className: "app-shell", children: [_jsx("div", { className: "text-[14px] text-[#666666] mb-3", children: todayLabel() }), _jsx(DailySummary, { totals: dailyTotals, targets: DAILY_TARGETS }), _jsx("div", { className: "text-[15px] font-bold text-[#333333] mb-2", children: "Today's meals" }), meals.length === 0 ? (_jsx("div", { className: "text-[#666666] text-center mt-8", children: "No meals logged today \u2014 tap + to start" })) : (_jsx("div", { className: "pb-20", children: meals.map((m) => (_jsx(MealCard, { meal: m, onDelete: removeMeal }, m.id))) })), _jsx("button", { type: "button", onClick: () => setShowSheet(true), "aria-label": "Add a meal", className: "fixed right-[calc(50%-312px)] bottom-6 w-14 h-14 rounded-full bg-[#4CAF50] text-white text-[30px] font-light border-none shadow-[0_2px_8px_rgba(0,0,0,0.2)]", children: "+" }), showSheet && (_jsx("div", { role: "dialog", "aria-label": "Add a meal", className: "fixed inset-0 bg-black/40 flex items-end justify-center z-10", onClick: () => {
                     setShowSheet(false);
                     setPendingAction(null);
-                }, children: _jsx("div", { onClick: (e) => e.stopPropagation(), style: {
-                        background: colors.card,
-                        borderRadius: '16px 16px 0 0',
-                        padding: 16,
-                        width: '100%',
-                        maxWidth: 640,
-                    }, children: pendingAction === null ? (_jsxs(_Fragment, { children: [_jsx("div", { style: { fontWeight: 700, fontSize: 16, marginBottom: 12 }, children: "Add a meal" }), _jsx("button", { type: "button", className: "btn btn-primary", style: { marginBottom: 8 }, onClick: () => setPendingAction('photo'), children: "\uD83D\uDCF7 Take / Upload Photo" }), _jsx("button", { type: "button", className: "btn btn-secondary", style: { marginBottom: 8 }, onClick: () => setPendingAction('search'), children: "\uD83D\uDD0D Search Food" }), _jsx("button", { type: "button", className: "btn btn-secondary", onClick: () => setShowSheet(false), children: "Cancel" })] })) : (_jsxs(_Fragment, { children: [_jsx("div", { style: { fontWeight: 700, fontSize: 16, marginBottom: 12 }, children: "Which meal?" }), MEAL_TYPES.map((mt) => (_jsx("button", { type: "button", className: "btn btn-secondary", style: { marginBottom: 8 }, onClick: () => handlePickMealType(mt), children: mt.charAt(0).toUpperCase() + mt.slice(1) }, mt))), _jsx("button", { type: "button", className: "btn btn-secondary", onClick: () => setPendingAction(null), children: "Back" })] })) }) }))] }));
+                }, children: _jsx("div", { onClick: (e) => e.stopPropagation(), className: "bg-white rounded-t-2xl p-4 w-full max-w-[640px]", children: pendingAction === null ? (_jsxs(_Fragment, { children: [_jsx("div", { className: "font-bold text-[16px] mb-3", children: "Add a meal" }), _jsx("button", { type: "button", className: "btn btn-primary mb-2", onClick: () => setPendingAction('photo'), children: "\uD83D\uDCF7 Take / Upload Photo" }), _jsx("button", { type: "button", className: "btn btn-secondary mb-2", onClick: () => setPendingAction('search'), children: "\uD83D\uDD0D Search Food" }), _jsx("button", { type: "button", className: "btn btn-secondary", onClick: () => setShowSheet(false), children: "Cancel" })] })) : (_jsxs(_Fragment, { children: [_jsx("div", { className: "font-bold text-[16px] mb-3", children: "Which meal?" }), MEAL_TYPES.map((mt) => (_jsx("button", { type: "button", className: "btn btn-secondary mb-2", onClick: () => handlePickMealType(mt), children: mt.charAt(0).toUpperCase() + mt.slice(1) }, mt))), _jsx("button", { type: "button", className: "btn btn-secondary", onClick: () => setPendingAction(null), children: "Back" })] })) }) }))] }));
 }

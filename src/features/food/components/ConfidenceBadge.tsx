@@ -1,4 +1,4 @@
-import { colors } from '../constants/colors';
+
 
 interface Props {
   confidence: 'high' | 'medium' | 'low';
@@ -11,7 +11,7 @@ export function ConfidenceBadge({ confidence }: Props) {
     return (
       <span
         aria-label="Medium confidence"
-        style={{ color: colors.warning, fontSize: 14, fontWeight: 700 }}
+        className="text-[#FF9800] text-sm font-bold"
       >
         !
       </span>
@@ -21,16 +21,9 @@ export function ConfidenceBadge({ confidence }: Props) {
   return (
     <span
       aria-label="Low confidence"
-      style={{
-        display: 'inline-flex',
-        gap: 4,
-        alignItems: 'center',
-        color: colors.danger,
-        fontWeight: 600,
-        fontSize: 12,
-      }}
+      className="inline-flex gap-1 items-center text-[#F44336] font-semibold text-xs"
     >
-      <span style={{ fontSize: 14, fontWeight: 700 }}>x</span>
+      <span className="text-sm font-bold">x</span>
       Low confidence
     </span>
   );

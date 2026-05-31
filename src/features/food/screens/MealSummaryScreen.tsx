@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useFoodStore } from '../store/foodStore';
 import { ManualEntryForm } from '../components/ManualEntryForm';
-import { colors } from '../constants/colors';
+
 import type { FoodItem, LogMealResponse } from '../types';
 
 interface LocationState {
@@ -29,7 +29,7 @@ export function MealSummaryScreen() {
   if (!response) {
     return (
       <div className="app-shell">
-        <p style={{ color: colors.textLight, textAlign: 'center', marginTop: 32 }}>
+        <p className="text-[#666666] text-center mt-8">
           No meal data. <button className="link-button" onClick={() => navigate('/')}>Go home</button>
         </p>
       </div>
@@ -46,26 +46,19 @@ export function MealSummaryScreen() {
   };
 
   const totalsRow = (label: string, value: string) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-      <span style={{ color: colors.textLight }}>{label}</span>
-      <span style={{ color: colors.text, fontWeight: 600 }}>{value}</span>
+    <div className="flex justify-between mb-1.5">
+      <span className="text-[#666666]">{label}</span>
+      <span className="text-[#333333] font-semibold">{value}</span>
     </div>
   );
 
   return (
-    <div className="app-shell" style={{ paddingBottom: 96 }}>
+    <div className="app-shell pb-24">
       {response.meal.image_uri && (
         <img
           src={response.meal.image_uri}
           alt="Meal photo thumbnail"
-          style={{
-            width: '100%',
-            height: 180,
-            borderRadius: 12,
-            marginBottom: 12,
-            background: colors.border,
-            objectFit: 'cover',
-          }}
+          className="w-full h-[180px] rounded-xl mb-3 bg-[#E0E0E0] object-cover"
         />
       )}
       <h1 className="screen-heading">Meal logged</h1>
@@ -74,7 +67,7 @@ export function MealSummaryScreen() {
       </div>
 
       <div className="card">
-        <div style={{ fontSize: 15, fontWeight: 600, color: colors.text, marginBottom: 8 }}>
+        <div className="text-[15px] font-semibold text-[#333333] mb-2">
           Meal totals
         </div>
         {totalsRow('Calories', `${response.meal.meal_total.calories} kcal`)}
@@ -83,26 +76,19 @@ export function MealSummaryScreen() {
         {totalsRow('Fat', `${response.meal.meal_total.fat_g} g`)}
       </div>
 
-      <div style={{ fontSize: 15, fontWeight: 700, color: colors.text, marginBottom: 8 }}>Items</div>
+      <div className="text-[15px] font-bold text-[#333333] mb-2">Items</div>
       {response.meal.items.map((item, idx) => (
         <div
           key={`${item.name}-${idx}`}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            background: colors.card,
-            borderRadius: 10,
-            padding: 12,
-            marginBottom: 8,
-          }}
+          className="flex items-center bg-white rounded-xl p-3 mb-2"
         >
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: colors.text }}>{item.name}</div>
-            <div style={{ fontSize: 12, color: colors.textLight, marginTop: 2 }}>
+          <div className="flex-1">
+            <div className="text-[14px] font-semibold text-[#333333]">{item.name}</div>
+            <div className="text-[12px] text-[#666666] mt-0.5">
               P {item.protein_g}g · C {item.carbs_g}g · F {item.fat_g}g
             </div>
           </div>
-          <span style={{ fontSize: 14, fontWeight: 700, color: colors.primary }}>
+          <span className="text-[14px] font-bold text-[#4CAF50]">
             {item.calories} kcal
           </span>
         </div>
@@ -118,32 +104,18 @@ export function MealSummaryScreen() {
       ))}
 
       <div
-        style={{
-          marginTop: 12,
-          background: colors.card,
-          borderRadius: 12,
-          padding: 14,
-          textAlign: 'center',
-        }}
+        className="mt-3 bg-white rounded-xl p-3.5 text-center"
       >
-        <div style={{ fontSize: 15, fontWeight: 600, color: colors.text }}>Today's calories</div>
-        <div style={{ fontSize: 24, fontWeight: 800, color: colors.primary, marginTop: 4 }}>
+        <div className="text-[15px] font-semibold text-[#333333]">Today's calories</div>
+        <div className="text-[24px] font-extrabold text-[#4CAF50] mt-1">
           {dailyTotals} kcal
         </div>
       </div>
 
       <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          padding: 16,
-          borderTop: `1px solid ${colors.border}`,
-          background: colors.background,
-        }}
+        className="fixed bottom-0 left-0 right-0 p-4 border-t border-solid border-[#E0E0E0] bg-[#F5F5F5]"
       >
-        <div style={{ maxWidth: 640, margin: '0 auto' }}>
+        <div className="max-w-[640px] mx-auto">
           <button
             type="button"
             onClick={() => navigate('/', { replace: true })}

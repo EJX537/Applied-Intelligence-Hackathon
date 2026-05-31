@@ -1,4 +1,4 @@
-import { colors } from '../constants/colors';
+
 
 interface Props {
   label: string;
@@ -14,33 +14,18 @@ export function NutrientBar({ label, value, target, unit, color }: Props) {
   const percentLabel = Math.round(ratio * 100);
 
   return (
-    <div
-      style={{ margin: '6px 0' }}
-      aria-label={`${label}: ${value} of ${target} ${unit}, ${percentLabel} percent`}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-        <span style={{ fontSize: 13, color: colors.text, fontWeight: 600 }}>{label}</span>
-        <span style={{ fontSize: 12, color: colors.textLight }}>
+    <div className="my-1.5" aria-label={`${label}: ${value} of ${target} ${unit}, ${percentLabel} percent`}>
+      <div className="flex justify-between mb-1">
+        <span className="text-[13px] text-[#333333] font-semibold">{label}</span>
+        <span className="text-xs text-[#666666]">
           {value}/{target}
           {unit}
         </span>
       </div>
-      <div
-        style={{
-          height: 8,
-          background: colors.border,
-          borderRadius: 4,
-          overflow: 'hidden',
-        }}
-      >
+      <div className="h-2 bg-[#E0E0E0] rounded overflow-hidden">
         <div
-          style={{
-            height: '100%',
-            width: `${widthPct}%`,
-            background: color,
-            borderRadius: 4,
-            transition: 'width 200ms ease',
-          }}
+          className="h-full rounded"
+          style={{ width: `${widthPct}%`, background: color, transition: 'width 200ms ease' }}
         />
       </div>
     </div>

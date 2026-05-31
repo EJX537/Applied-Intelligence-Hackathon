@@ -1,47 +1,8 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { colors } from '../constants/colors';
 export function PortionPicker({ options, selectedGrams, onSelect, onCustomPress, customActive, }) {
-    const chipStyle = (selected) => ({
-        minWidth: 84,
-        padding: '10px 12px',
-        borderRadius: 12,
-        border: `1px solid ${selected ? colors.primary : colors.border}`,
-        background: selected ? colors.primary : colors.card,
-        color: selected ? '#fff' : colors.text,
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        flexShrink: 0,
-    });
-    return (_jsxs("div", { style: {
-            display: 'flex',
-            gap: 8,
-            overflowX: 'auto',
-            padding: '8px 0',
-        }, children: [options.map((opt) => {
+    const chipClass = (selected) => `min-w-[84px] px-3 py-2.5 rounded-xl border ${selected ? 'border-[#4CAF50] bg-[#4CAF50] text-white' : 'border-[#E0E0E0] bg-white text-[#333333]'} cursor-pointer flex flex-col items-center shrink-0`;
+    return (_jsxs("div", { className: "flex gap-2 overflow-x-auto py-2", children: [options.map((opt) => {
                 const isSelected = !customActive && selectedGrams === opt.grams;
-                return (_jsxs("button", { type: "button", onClick: () => onSelect(opt.grams), "aria-label": `${opt.label}, ${opt.grams} grams, ${opt.visual}`, "aria-pressed": isSelected, style: chipStyle(isSelected), children: [_jsx("span", { style: {
-                                fontSize: 16,
-                                fontWeight: 700,
-                                color: isSelected ? '#fff' : colors.textLight,
-                            }, children: opt.ref }), _jsx("span", { style: { fontSize: 13, fontWeight: 600, marginTop: 2 }, children: opt.label }), _jsxs("span", { style: {
-                                fontSize: 12,
-                                marginTop: 2,
-                                color: isSelected ? '#fff' : colors.textLight,
-                            }, children: [opt.grams, "g"] }), _jsx("span", { style: {
-                                fontSize: 10,
-                                marginTop: 2,
-                                textAlign: 'center',
-                                color: isSelected ? '#fff' : colors.textLight,
-                            }, children: opt.visual })] }, opt.ref));
-            }), _jsxs("button", { type: "button", onClick: onCustomPress, "aria-label": "Set a custom portion in grams", "aria-pressed": customActive, style: chipStyle(customActive), children: [_jsx("span", { style: {
-                            fontSize: 16,
-                            fontWeight: 700,
-                            color: customActive ? '#fff' : colors.textLight,
-                        }, children: "+" }), _jsx("span", { style: { fontSize: 13, fontWeight: 600, marginTop: 2 }, children: "Custom" }), _jsx("span", { style: {
-                            fontSize: 12,
-                            marginTop: 2,
-                            color: customActive ? '#fff' : colors.textLight,
-                        }, children: "set grams" })] })] }));
+                return (_jsxs("button", { type: "button", onClick: () => onSelect(opt.grams), "aria-label": `${opt.label}, ${opt.grams} grams, ${opt.visual}`, "aria-pressed": isSelected, className: chipClass(isSelected), children: [_jsx("span", { className: `text-base font-bold ${isSelected ? 'text-white' : 'text-[#666666]'}`, children: opt.ref }), _jsx("span", { className: "text-[13px] font-semibold mt-0.5", children: opt.label }), _jsxs("span", { className: `text-xs mt-0.5 ${isSelected ? 'text-white' : 'text-[#666666]'}`, children: [opt.grams, "g"] }), _jsx("span", { className: `text-[10px] mt-0.5 text-center ${isSelected ? 'text-white' : 'text-[#666666]'}`, children: opt.visual })] }, opt.ref));
+            }), _jsxs("button", { type: "button", onClick: onCustomPress, "aria-label": "Set a custom portion in grams", "aria-pressed": customActive, className: chipClass(customActive), children: [_jsx("span", { className: `text-base font-bold ${customActive ? 'text-white' : 'text-[#666666]'}`, children: "+" }), _jsx("span", { className: "text-[13px] font-semibold mt-0.5", children: "Custom" }), _jsx("span", { className: `text-xs mt-0.5 ${customActive ? 'text-white' : 'text-[#666666]'}`, children: "set grams" })] })] }));
 }

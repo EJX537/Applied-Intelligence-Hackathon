@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { colors } from '../constants/colors';
 
 interface ManualNutrients {
   calories: number;
@@ -34,96 +33,65 @@ export function ManualEntryForm({ itemName, onSubmit, onSkip }: Props) {
     });
   };
 
-  const rowStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: 10,
-  };
-  const labelStyle: React.CSSProperties = {
-    width: 100,
-    fontSize: 13,
-    color: colors.textLight,
-  };
-  const inputStyle: React.CSSProperties = {
-    flex: 1,
-    height: 40,
-    border: `1px solid ${colors.border}`,
-    borderRadius: 8,
-    padding: '0 10px',
-    background: '#fafafa',
-    color: colors.text,
-    fontSize: 14,
-  };
+  const rowClass = 'flex items-center mb-2.5';
+  const labelClass = 'w-[100px] text-[13px] text-[#666666]';
+  const inputClass = 'flex-1 h-10 border border-[#E0E0E0] rounded-lg px-2.5 bg-[#fafafa] text-[#333333] text-sm';
 
   return (
-    <div
-      style={{
-        background: colors.card,
-        borderRadius: 12,
-        padding: 16,
-        margin: '8px 0',
-      }}
-    >
-      <div style={{ fontSize: 15, fontWeight: 600, color: colors.text, marginBottom: 12 }}>
+    <div className="bg-white rounded-xl p-4 my-2">
+      <div className="text-[15px] font-semibold text-[#333333] mb-3">
         Add nutrition for: {itemName}
       </div>
-      <div style={rowStyle}>
-        <span style={labelStyle}>Calories</span>
+      <div className={rowClass}>
+        <span className={labelClass}>Calories</span>
         <input
           type="number"
           value={calories}
           onChange={(e) => setCalories(e.target.value)}
           placeholder="0"
           aria-label={`Calories for ${itemName}`}
-          style={inputStyle}
+          className={inputClass}
         />
       </div>
-      <div style={rowStyle}>
-        <span style={labelStyle}>Protein (g)</span>
+      <div className={rowClass}>
+        <span className={labelClass}>Protein (g)</span>
         <input
           type="number"
           value={protein}
           onChange={(e) => setProtein(e.target.value)}
           placeholder="0"
           aria-label={`Protein grams for ${itemName}`}
-          style={inputStyle}
+          className={inputClass}
         />
       </div>
-      <div style={rowStyle}>
-        <span style={labelStyle}>Carbs (g)</span>
+      <div className={rowClass}>
+        <span className={labelClass}>Carbs (g)</span>
         <input
           type="number"
           value={carbs}
           onChange={(e) => setCarbs(e.target.value)}
           placeholder="0"
           aria-label={`Carbs grams for ${itemName}`}
-          style={inputStyle}
+          className={inputClass}
         />
       </div>
-      <div style={rowStyle}>
-        <span style={labelStyle}>Fat (g)</span>
+      <div className={rowClass}>
+        <span className={labelClass}>Fat (g)</span>
         <input
           type="number"
           value={fat}
           onChange={(e) => setFat(e.target.value)}
           placeholder="0"
           aria-label={`Fat grams for ${itemName}`}
-          style={inputStyle}
+          className={inputClass}
         />
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+      <div className="flex flex-col gap-2 mt-2">
         <button
           type="button"
           onClick={handleSave}
           aria-label={`Save nutrition for ${itemName}`}
-          style={{
-            height: 44,
-            borderRadius: 10,
-            background: colors.primary,
-            color: '#fff',
-            fontWeight: 600,
-            border: 'none',
-          }}
+          className="h-11 rounded-xl bg-[#4CAF50] text-white font-semibold border-none"
         >
           Save
         </button>
@@ -131,13 +99,7 @@ export function ManualEntryForm({ itemName, onSubmit, onSkip }: Props) {
           type="button"
           onClick={onSkip}
           aria-label={`Skip and log ${itemName} without nutrition`}
-          style={{
-            height: 44,
-            borderRadius: 10,
-            background: 'transparent',
-            color: colors.textLight,
-            border: `1px solid ${colors.border}`,
-          }}
+          className="h-11 rounded-xl bg-transparent text-[#666666] border border-[#E0E0E0]"
         >
           Skip — log without nutrition
         </button>

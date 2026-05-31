@@ -1,6 +1,5 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from 'react';
-import { colors } from '../constants/colors';
 export function CustomGramInput({ onSubmit }) {
     const [text, setText] = useState('');
     const handleSubmit = () => {
@@ -9,25 +8,8 @@ export function CustomGramInput({ onSubmit }) {
             return;
         onSubmit(parsed);
     };
-    return (_jsxs("div", { style: { display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }, children: [_jsx("input", { type: "number", inputMode: "numeric", value: text, onChange: (e) => setText(e.target.value), onKeyDown: (e) => {
+    return (_jsxs("div", { className: "flex items-center gap-2 mt-2", children: [_jsx("input", { type: "number", inputMode: "numeric", value: text, onChange: (e) => setText(e.target.value), onKeyDown: (e) => {
                     if (e.key === 'Enter')
                         handleSubmit();
-                }, placeholder: "grams", "aria-label": "Custom portion in grams", style: {
-                    flex: 1,
-                    height: 40,
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: 8,
-                    padding: '0 12px',
-                    background: colors.card,
-                    color: colors.text,
-                    fontSize: 14,
-                } }), _jsx("button", { type: "button", onClick: handleSubmit, "aria-label": "Set custom grams", style: {
-                    background: colors.primary,
-                    color: '#fff',
-                    fontWeight: 600,
-                    border: 'none',
-                    height: 40,
-                    padding: '0 16px',
-                    borderRadius: 8,
-                }, children: "Set" })] }));
+                }, placeholder: "grams", "aria-label": "Custom portion in grams", className: "flex-1 h-10 border border-[#E0E0E0] rounded-lg px-3 bg-white text-[#333333] text-sm" }), _jsx("button", { type: "button", onClick: handleSubmit, "aria-label": "Set custom grams", className: "bg-[#4CAF50] text-white font-semibold border-none h-10 px-4 rounded-lg", children: "Set" })] }));
 }

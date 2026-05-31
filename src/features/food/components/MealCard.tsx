@@ -1,5 +1,4 @@
 import type { MealEntry } from '../types';
-import { colors } from '../constants/colors';
 
 interface Props {
   meal: MealEntry;
@@ -26,43 +25,26 @@ export function MealCard({ meal, onDelete }: Props) {
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        background: colors.card,
-        padding: 12,
-        borderRadius: 12,
-        marginBottom: 8,
-        gap: 12,
-      }}
-    >
-      <span style={{ fontSize: 28 }}>{MEAL_ICONS[meal.meal_type]}</span>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 16, fontWeight: 600, color: colors.text }}>
+    <div className="flex items-center gap-3 bg-white p-3 rounded-xl mb-2">
+      <span className="text-[28px]">{MEAL_ICONS[meal.meal_type]}</span>
+      <div className="flex-1">
+        <div className="text-base font-semibold text-[#333333]">
           {meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1)}
         </div>
-        <div style={{ fontSize: 12, color: colors.textLight, marginTop: 2 }}>
+        <div className="text-xs text-[#666666] mt-0.5">
           {formatTime(meal.timestamp)} · {meal.items.length} item
           {meal.items.length === 1 ? '' : 's'}
         </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
-        <span style={{ fontSize: 14, fontWeight: 700, color: colors.primary }}>
+      <div className="flex flex-col items-end gap-1.5">
+        <span className="text-sm font-bold text-[#4CAF50]">
           {meal.meal_total.calories} kcal
         </span>
         <button
           type="button"
           onClick={handleDelete}
           aria-label={`Delete ${meal.meal_type}`}
-          style={{
-            color: colors.danger,
-            background: 'transparent',
-            border: 'none',
-            fontSize: 12,
-            fontWeight: 600,
-            padding: '4px 8px',
-          }}
+          className="text-[#F44336] bg-transparent border-none text-xs font-semibold px-2 py-1"
         >
           Delete
         </button>

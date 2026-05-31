@@ -6,7 +6,6 @@ import { PortionPicker } from '../components/PortionPicker';
 import { QuantityStepper } from '../components/QuantityStepper';
 import { CustomGramInput } from '../components/CustomGramInput';
 import { ConfidenceBadge } from '../components/ConfidenceBadge';
-import { colors } from '../constants/colors';
 import { logMeal } from '../services/foodApi';
 function defaultPortionFor(category) {
     const options = PORTION_SIZES[category];
@@ -105,60 +104,10 @@ export function PortionSelectScreen() {
             setSubmitting(false);
         }
     };
-    return (_jsxs("div", { className: "app-shell", children: [_jsx("h1", { style: { fontSize: 20, fontWeight: 700, color: colors.text, marginBottom: 12 }, children: "Confirm portions" }), states.map((s, index) => {
+    return (_jsxs("div", { className: "app-shell", children: [_jsx("h1", { className: "text-[20px] font-bold text-[#333333] mb-3", children: "Confirm portions" }), states.map((s, index) => {
                 const options = PORTION_SIZES[s.item.category];
                 const isMixed = s.item.category === 'mixed';
                 const total = (s.portion_grams ?? 0) * s.quantity;
-                return (_jsxs("div", { style: {
-                        background: colors.card,
-                        borderRadius: 12,
-                        padding: 12,
-                        marginBottom: 12,
-                    }, children: [_jsxs("div", { style: { display: 'flex', alignItems: 'center', gap: 8 }, children: [_jsx("input", { value: s.editedName, onChange: (e) => update(index, { editedName: e.target.value, edited: true }), "aria-label": `Edit name for ${s.originalName}`, style: {
-                                        flex: 1,
-                                        fontSize: 16,
-                                        fontWeight: 600,
-                                        color: colors.text,
-                                        borderTop: 'none',
-                                        borderLeft: 'none',
-                                        borderRight: 'none',
-                                        borderBottom: `1px solid ${colors.border}`,
-                                        background: 'transparent',
-                                        padding: '4px 0',
-                                    } }), _jsx(ConfidenceBadge, { confidence: s.item.confidence })] }), _jsx("div", { style: {
-                                fontSize: 12,
-                                color: colors.textLight,
-                                textTransform: 'uppercase',
-                                margin: '4px 0',
-                            }, children: s.item.category }), !isMixed && (_jsx(PortionPicker, { options: options, selectedGrams: s.portion_grams, onSelect: (g) => update(index, { portion_grams: g, customActive: false }), onCustomPress: () => update(index, { customActive: true }), customActive: s.customActive })), (s.customActive || isMixed) && (_jsx(CustomGramInput, { onSubmit: (g) => update(index, { portion_grams: g, customActive: true }) })), _jsxs("div", { style: {
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginTop: 8,
-                            }, children: [_jsx("span", { style: { color: colors.textLight, fontSize: 13 }, children: "Quantity" }), _jsx(QuantityStepper, { quantity: s.quantity, onChange: (q) => update(index, { quantity: q }) })] }), _jsxs("div", { style: { marginTop: 10, fontSize: 14, color: colors.text, fontWeight: 600 }, children: [s.portion_grams ?? '—', "g \u00D7 ", s.quantity, " = ", total, "g"] }), _jsxs("div", { style: { display: 'flex', justifyContent: 'space-between', marginTop: 12 }, children: [_jsx("button", { type: "button", onClick: () => update(index, { edited: true }), style: {
-                                        background: 'transparent',
-                                        border: 'none',
-                                        color: colors.secondary,
-                                        fontSize: 13,
-                                        fontWeight: 600,
-                                    }, children: "Edit name" }), _jsx("button", { type: "button", onClick: () => removeAt(index), "aria-label": `Remove ${s.originalName}`, style: {
-                                        background: 'transparent',
-                                        border: 'none',
-                                        color: colors.danger,
-                                        fontSize: 13,
-                                        fontWeight: 600,
-                                    }, children: "Remove" })] })] }, `${s.originalName}-${index}`));
-            }), _jsx("button", { type: "button", onClick: addManualItem, style: {
-                    width: '100%',
-                    background: colors.card,
-                    borderRadius: 12,
-                    padding: 14,
-                    border: `1px dashed ${colors.border}`,
-                    color: colors.secondary,
-                    fontWeight: 600,
-                }, children: "+ Add another item manually" }), _jsx("div", { style: {
-                    padding: '16px 0 24px',
-                    marginTop: 16,
-                    borderTop: `1px solid ${colors.border}`,
-                }, children: _jsx("button", { type: "button", onClick: handleConfirm, disabled: !allReady || submitting, className: `btn btn-primary${!allReady || submitting ? ' btn-disabled' : ''}`, "aria-label": "Confirm and calculate nutrition", children: submitting ? 'Saving…' : 'Confirm & Calculate' }) })] }));
+                return (_jsxs("div", { className: "bg-white rounded-xl p-3 mb-3", children: [_jsxs("div", { className: "flex items-center gap-2", children: [_jsx("input", { value: s.editedName, onChange: (e) => update(index, { editedName: e.target.value, edited: true }), "aria-label": `Edit name for ${s.originalName}`, className: "flex-1 text-[16px] font-semibold text-[#333333] border-0 border-b border-solid border-[#E0E0E0] bg-transparent py-1" }), _jsx(ConfidenceBadge, { confidence: s.item.confidence })] }), _jsx("div", { className: "text-[12px] text-[#666666] uppercase my-1", children: s.item.category }), !isMixed && (_jsx(PortionPicker, { options: options, selectedGrams: s.portion_grams, onSelect: (g) => update(index, { portion_grams: g, customActive: false }), onCustomPress: () => update(index, { customActive: true }), customActive: s.customActive })), (s.customActive || isMixed) && (_jsx(CustomGramInput, { onSubmit: (g) => update(index, { portion_grams: g, customActive: true }) })), _jsxs("div", { className: "flex items-center justify-between mt-2", children: [_jsx("span", { className: "text-[#666666] text-[13px]", children: "Quantity" }), _jsx(QuantityStepper, { quantity: s.quantity, onChange: (q) => update(index, { quantity: q }) })] }), _jsxs("div", { className: "mt-2.5 text-[14px] text-[#333333] font-semibold", children: [s.portion_grams ?? '—', "g \u00D7 ", s.quantity, " = ", total, "g"] }), _jsxs("div", { className: "flex justify-between mt-3", children: [_jsx("button", { type: "button", onClick: () => update(index, { edited: true }), className: "bg-transparent border-none text-[#2196F3] text-[13px] font-semibold", children: "Edit name" }), _jsx("button", { type: "button", onClick: () => removeAt(index), "aria-label": `Remove ${s.originalName}`, className: "bg-transparent border-none text-[#F44336] text-[13px] font-semibold", children: "Remove" })] })] }, `${s.originalName}-${index}`));
+            }), _jsx("button", { type: "button", onClick: addManualItem, className: "w-full bg-white rounded-xl p-3.5 border border-dashed border-[#E0E0E0] text-[#2196F3] font-semibold", children: "+ Add another item manually" }), _jsx("div", { className: "py-4 pb-6 mt-4 border-t border-solid border-[#E0E0E0]", children: _jsx("button", { type: "button", onClick: handleConfirm, disabled: !allReady || submitting, className: `btn btn-primary${!allReady || submitting ? ' btn-disabled' : ''}`, "aria-label": "Confirm and calculate nutrition", children: submitting ? 'Saving…' : 'Confirm & Calculate' }) })] }));
 }

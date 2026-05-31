@@ -5,7 +5,7 @@ import { PortionPicker } from '../components/PortionPicker';
 import { QuantityStepper } from '../components/QuantityStepper';
 import { CustomGramInput } from '../components/CustomGramInput';
 import { ConfidenceBadge } from '../components/ConfidenceBadge';
-import { colors } from '../constants/colors';
+
 import { logMeal } from '../services/foodApi';
 import type {
   FoodCategory,
@@ -142,7 +142,7 @@ export function PortionSelectScreen() {
 
   return (
     <div className="app-shell">
-      <h1 style={{ fontSize: 20, fontWeight: 700, color: colors.text, marginBottom: 12 }}>
+      <h1 className="text-[20px] font-bold text-[#333333] mb-3">
         Confirm portions
       </h1>
       {states.map((s, index) => {
@@ -152,40 +152,19 @@ export function PortionSelectScreen() {
         return (
           <div
             key={`${s.originalName}-${index}`}
-            style={{
-              background: colors.card,
-              borderRadius: 12,
-              padding: 12,
-              marginBottom: 12,
-            }}
+            className="bg-white rounded-xl p-3 mb-3"
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div className="flex items-center gap-2">
               <input
                 value={s.editedName}
                 onChange={(e) => update(index, { editedName: e.target.value, edited: true })}
                 aria-label={`Edit name for ${s.originalName}`}
-                style={{
-                  flex: 1,
-                  fontSize: 16,
-                  fontWeight: 600,
-                  color: colors.text,
-                  borderTop: 'none',
-                  borderLeft: 'none',
-                  borderRight: 'none',
-                  borderBottom: `1px solid ${colors.border}`,
-                  background: 'transparent',
-                  padding: '4px 0',
-                }}
+                className="flex-1 text-[16px] font-semibold text-[#333333] border-0 border-b border-solid border-[#E0E0E0] bg-transparent py-1"
               />
               <ConfidenceBadge confidence={s.item.confidence} />
             </div>
             <div
-              style={{
-                fontSize: 12,
-                color: colors.textLight,
-                textTransform: 'uppercase',
-                margin: '4px 0',
-              }}
+              className="text-[12px] text-[#666666] uppercase my-1"
             >
               {s.item.category}
             </div>
@@ -204,33 +183,22 @@ export function PortionSelectScreen() {
               />
             )}
             <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginTop: 8,
-              }}
+              className="flex items-center justify-between mt-2"
             >
-              <span style={{ color: colors.textLight, fontSize: 13 }}>Quantity</span>
+              <span className="text-[#666666] text-[13px]">Quantity</span>
               <QuantityStepper
                 quantity={s.quantity}
                 onChange={(q) => update(index, { quantity: q })}
               />
             </div>
-            <div style={{ marginTop: 10, fontSize: 14, color: colors.text, fontWeight: 600 }}>
+            <div className="mt-2.5 text-[14px] text-[#333333] font-semibold">
               {s.portion_grams ?? '—'}g × {s.quantity} = {total}g
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
+            <div className="flex justify-between mt-3">
               <button
                 type="button"
                 onClick={() => update(index, { edited: true })}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: colors.secondary,
-                  fontSize: 13,
-                  fontWeight: 600,
-                }}
+                className="bg-transparent border-none text-[#2196F3] text-[13px] font-semibold"
               >
                 Edit name
               </button>
@@ -238,13 +206,7 @@ export function PortionSelectScreen() {
                 type="button"
                 onClick={() => removeAt(index)}
                 aria-label={`Remove ${s.originalName}`}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: colors.danger,
-                  fontSize: 13,
-                  fontWeight: 600,
-                }}
+                className="bg-transparent border-none text-[#F44336] text-[13px] font-semibold"
               >
                 Remove
               </button>
@@ -255,25 +217,13 @@ export function PortionSelectScreen() {
       <button
         type="button"
         onClick={addManualItem}
-        style={{
-          width: '100%',
-          background: colors.card,
-          borderRadius: 12,
-          padding: 14,
-          border: `1px dashed ${colors.border}`,
-          color: colors.secondary,
-          fontWeight: 600,
-        }}
+        className="w-full bg-white rounded-xl p-3.5 border border-dashed border-[#E0E0E0] text-[#2196F3] font-semibold"
       >
         + Add another item manually
       </button>
 
       <div
-        style={{
-          padding: '16px 0 24px',
-          marginTop: 16,
-          borderTop: `1px solid ${colors.border}`,
-        }}
+        className="py-4 pb-6 mt-4 border-t border-solid border-[#E0E0E0]"
       >
         <button
           type="button"

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useConsentStatus } from '../hooks/useConsentStatus';
 import { useFoodStore } from '../store/foodStore';
 import { analyzeMealPhoto } from '../services/foodApi';
-import { colors } from '../constants/colors';
+
 import type { MealType } from '../types';
 
 interface LocationState {
@@ -65,36 +65,23 @@ export function CameraScreen() {
 
   if (consentLoading || hasConsent === null) {
     return (
-      <div className="app-shell" style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
-        <span style={{ color: colors.textLight }}>Loading…</span>
+      <div className="app-shell flex justify-center p-12">
+        <span className="text-[#666666]">Loading…</span>
       </div>
     );
   }
 
   return (
     <div
-      className="app-shell"
-      style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 24 }}
+      className="app-shell flex flex-col justify-center p-6"
     >
       <h1
-        style={{
-          fontSize: 24,
-          fontWeight: 700,
-          color: colors.text,
-          textAlign: 'center',
-          textTransform: 'capitalize',
-          margin: 0,
-        }}
+        className="text-[24px] font-bold text-[#333333] text-center capitalize m-0"
       >
         Log a {mealType}
       </h1>
       <p
-        style={{
-          fontSize: 14,
-          color: colors.textLight,
-          textAlign: 'center',
-          margin: '8px 0 32px',
-        }}
+        className="text-[14px] text-[#666666] text-center my-2 mb-8"
       >
         Upload a photo of your meal to get started.
       </p>
@@ -116,7 +103,7 @@ export function CameraScreen() {
       />
 
       {analyzing ? (
-        <div style={{ textAlign: 'center', color: colors.textLight, fontSize: 14 }}>
+        <div className="text-center text-[#666666] text-[14px]">
           Analyzing your meal…
         </div>
       ) : (
@@ -124,8 +111,7 @@ export function CameraScreen() {
           <button
             type="button"
             onClick={() => cameraInputRef.current?.click()}
-            className="btn btn-primary"
-            style={{ marginBottom: 12 }}
+            className="btn btn-primary mb-3"
             aria-label="Take photo with camera"
           >
             📷 Take Photo
@@ -133,8 +119,7 @@ export function CameraScreen() {
           <button
             type="button"
             onClick={() => galleryInputRef.current?.click()}
-            className="btn btn-secondary"
-            style={{ marginBottom: 12 }}
+            className="btn btn-secondary mb-3"
             aria-label="Choose photo from device"
           >
             🖼 Choose from Device
@@ -142,8 +127,7 @@ export function CameraScreen() {
           <button
             type="button"
             onClick={() => navigate('/manual-search', { replace: true, state: { mealType } })}
-            className="link-button"
-            style={{ marginTop: 24, alignSelf: 'center' }}
+            className="link-button mt-6 self-center"
           >
             Or search foods manually
           </button>

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import debounce from 'lodash/debounce';
 import { searchFood } from '../services/foodApi';
-import { colors } from '../constants/colors';
+
 import type { MealType, SearchFoodResult, RecognizedItem } from '../types';
 
 interface LocationState {
@@ -61,7 +61,7 @@ export function ManualFoodSearchScreen() {
   };
 
   return (
-    <div className="app-shell" style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className="app-shell flex flex-col">
       <input
         className="input"
         type="search"
@@ -72,37 +72,27 @@ export function ManualFoodSearchScreen() {
         aria-label="Search foods"
       />
       {loading && (
-        <div style={{ margin: '16px 0', color: colors.textLight }}>Searching…</div>
+        <div className="my-4 text-[#666666]">Searching…</div>
       )}
       {error && (
-        <div style={{ color: colors.danger, margin: '12px 0', textAlign: 'center' }}>{error}</div>
+        <div className="text-[#F44336] my-3 text-center">{error}</div>
       )}
       {!loading && !error && query.trim().length === 0 && (
-        <div style={{ color: colors.textLight, textAlign: 'center', marginTop: 32 }}>
+        <div className="text-[#666666] text-center mt-8">
           Start typing to search foods
         </div>
       )}
-      <div style={{ padding: '12px 0' }}>
+      <div className="py-3">
         {results.map((item) => (
           <button
             type="button"
             key={item.fdc_id}
             onClick={() => handleSelect(item)}
             aria-label={`Select ${item.name}`}
-            style={{
-              display: 'block',
-              width: '100%',
-              textAlign: 'left',
-              background: colors.card,
-              padding: 14,
-              borderRadius: 10,
-              marginBottom: 8,
-              border: 'none',
-              cursor: 'pointer',
-            }}
+            className="block w-full text-left bg-white p-3.5 rounded-xl mb-2 border-none cursor-pointer"
           >
-            <div style={{ fontSize: 15, fontWeight: 600, color: colors.text }}>{item.name}</div>
-            <div style={{ fontSize: 12, color: colors.textLight, marginTop: 4 }}>
+            <div className="text-[15px] font-semibold text-[#333333]">{item.name}</div>
+            <div className="text-[12px] text-[#666666] mt-1">
               {item.category} · {item.nutrients_per_100g.calories} kcal / 100g
             </div>
           </button>

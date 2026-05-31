@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useConsentStatus } from '../hooks/useConsentStatus';
 import { useFoodStore } from '../store/foodStore';
 import { analyzeMealPhoto } from '../services/foodApi';
-import { colors } from '../constants/colors';
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -56,19 +55,7 @@ export function CameraScreen() {
         }
     };
     if (consentLoading || hasConsent === null) {
-        return (_jsx("div", { className: "app-shell", style: { display: 'flex', justifyContent: 'center', padding: 48 }, children: _jsx("span", { style: { color: colors.textLight }, children: "Loading\u2026" }) }));
+        return (_jsx("div", { className: "app-shell flex justify-center p-12", children: _jsx("span", { className: "text-[#666666]", children: "Loading\u2026" }) }));
     }
-    return (_jsxs("div", { className: "app-shell", style: { display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 24 }, children: [_jsxs("h1", { style: {
-                    fontSize: 24,
-                    fontWeight: 700,
-                    color: colors.text,
-                    textAlign: 'center',
-                    textTransform: 'capitalize',
-                    margin: 0,
-                }, children: ["Log a ", mealType] }), _jsx("p", { style: {
-                    fontSize: 14,
-                    color: colors.textLight,
-                    textAlign: 'center',
-                    margin: '8px 0 32px',
-                }, children: "Upload a photo of your meal to get started." }), _jsx("input", { ref: cameraInputRef, type: "file", accept: "image/*", capture: "environment", hidden: true, onChange: (e) => handleFile(e.target.files?.[0]) }), _jsx("input", { ref: galleryInputRef, type: "file", accept: "image/*", hidden: true, onChange: (e) => handleFile(e.target.files?.[0]) }), analyzing ? (_jsx("div", { style: { textAlign: 'center', color: colors.textLight, fontSize: 14 }, children: "Analyzing your meal\u2026" })) : (_jsxs(_Fragment, { children: [_jsx("button", { type: "button", onClick: () => cameraInputRef.current?.click(), className: "btn btn-primary", style: { marginBottom: 12 }, "aria-label": "Take photo with camera", children: "\uD83D\uDCF7 Take Photo" }), _jsx("button", { type: "button", onClick: () => galleryInputRef.current?.click(), className: "btn btn-secondary", style: { marginBottom: 12 }, "aria-label": "Choose photo from device", children: "\uD83D\uDDBC Choose from Device" }), _jsx("button", { type: "button", onClick: () => navigate('/manual-search', { replace: true, state: { mealType } }), className: "link-button", style: { marginTop: 24, alignSelf: 'center' }, children: "Or search foods manually" })] }))] }));
+    return (_jsxs("div", { className: "app-shell flex flex-col justify-center p-6", children: [_jsxs("h1", { className: "text-[24px] font-bold text-[#333333] text-center capitalize m-0", children: ["Log a ", mealType] }), _jsx("p", { className: "text-[14px] text-[#666666] text-center my-2 mb-8", children: "Upload a photo of your meal to get started." }), _jsx("input", { ref: cameraInputRef, type: "file", accept: "image/*", capture: "environment", hidden: true, onChange: (e) => handleFile(e.target.files?.[0]) }), _jsx("input", { ref: galleryInputRef, type: "file", accept: "image/*", hidden: true, onChange: (e) => handleFile(e.target.files?.[0]) }), analyzing ? (_jsx("div", { className: "text-center text-[#666666] text-[14px]", children: "Analyzing your meal\u2026" })) : (_jsxs(_Fragment, { children: [_jsx("button", { type: "button", onClick: () => cameraInputRef.current?.click(), className: "btn btn-primary mb-3", "aria-label": "Take photo with camera", children: "\uD83D\uDCF7 Take Photo" }), _jsx("button", { type: "button", onClick: () => galleryInputRef.current?.click(), className: "btn btn-secondary mb-3", "aria-label": "Choose photo from device", children: "\uD83D\uDDBC Choose from Device" }), _jsx("button", { type: "button", onClick: () => navigate('/manual-search', { replace: true, state: { mealType } }), className: "link-button mt-6 self-center", children: "Or search foods manually" })] }))] }));
 }
