@@ -71,20 +71,7 @@ export function FoodLogScreen() {
         type="button"
         onClick={() => setShowSheet(true)}
         aria-label="Add a meal"
-        style={{
-          position: 'fixed',
-          right: 'calc(50% - 312px)',
-          bottom: 24,
-          width: 56,
-          height: 56,
-          borderRadius: 28,
-          background: colors.primary,
-          color: '#fff',
-          fontSize: 30,
-          fontWeight: 300,
-          border: 'none',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-        }}
+        className="floating-add-btn"
       >
         +
       </button>
@@ -123,10 +110,14 @@ export function FoodLogScreen() {
                 <button
                   type="button"
                   className="btn btn-primary"
-                  style={{ marginBottom: 8 }}
+                  style={{ marginBottom: 8, gap: 8 }}
                   onClick={() => setPendingAction('photo')}
                 >
-                  📷 Take / Upload Photo
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg>
+                  Capture Image
                 </button>
                 <button
                   type="button"
