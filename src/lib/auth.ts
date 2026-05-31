@@ -93,28 +93,46 @@ function now(): string {
   return new Date().toISOString()
 }
 
-// ── Seed demo user on first load ───────────────────────────────────────
+// ── Seed users on first load ───────────────────────────────────────────
 
 const DEMO_EMAIL = 'd@d.d'
 const DEMO_PASSWORD = 'd'
+const ADMIN_EMAIL = 'a@a.a'
+const ADMIN_PASSWORD = 'a'
 
-function seedDemoUser() {
+function seedUsers() {
   const users = readUsers()
   if (!users.has(DEMO_EMAIL)) {
-    const user: InsForgeUser = {
-      id: generateId(),
-      email: DEMO_EMAIL,
-      name: 'Demo User',
-      emailVerified: true,
-      createdAt: now(),
-      updatedAt: now(),
-    }
-    users.set(DEMO_EMAIL, { user, password: DEMO_PASSWORD })
-    writeUsers(users)
+    users.set(DEMO_EMAIL, {
+      user: {
+        id: generateId(),
+        email: DEMO_EMAIL,
+        name: 'Demo User',
+        emailVerified: true,
+        createdAt: now(),
+        updatedAt: now(),
+      },
+      password: DEMO_PASSWORD,
+    })
   }
+  if (!users.has(ADMIN_EMAIL)) {
+    users.set(ADMIN_EMAIL, {
+      user: {
+        id: generateId(),
+        email: ADMIN_EMAIL,
+        name: 'Admin',
+        emailVerified: true,
+        createdAt: now(),
+        updatedAt: now(),
+        metadata: { role: 'admin' },
+      },
+      password: ADMIN_PASSWORD,
+    })
+  }
+  writeUsers(users)
 }
 
-seedDemoUser()
+seedUsers()
 
 // ── Mock client factory ────────────────────────────────────────────────
 

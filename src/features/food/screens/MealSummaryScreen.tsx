@@ -30,7 +30,7 @@ export function MealSummaryScreen() {
     return (
       <div className="app-shell">
         <p className="text-[#666666] text-center mt-8">
-          No meal data. <button className="link-button" onClick={() => navigate('/')}>Go home</button>
+          No meal data. <button className="link-button" onClick={() => navigate('/user')}>Go home</button>
         </p>
       </div>
     );

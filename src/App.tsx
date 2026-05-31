@@ -1,9 +1,9 @@
-import { Routes, Route, Outlet, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { AuthPage } from './pages/AuthPage'
-import { useHealthKit } from './hooks/useHealthKit'
+import { HealthKitProvider, useHealthKitCtx } from './contexts/HealthKitContext'
 import { AppLayout } from './components/layout/AppLayout'
-import { DashboardPage } from './pages/DashboardPage'
+import { AdminLayout } from './components/layout/AdminLayout'
 import { StepsPage } from './pages/StepsPage'
 import { HeartPage } from './pages/HeartPage'
 import { ActivityPage } from './pages/ActivityPage'
@@ -16,29 +16,24 @@ import { MealSummaryScreen } from './features/food/screens/MealSummaryScreen'
 import { WellPathHomePage } from './pages/WellPathHomePage'
 import { WellPathOralHealthPage } from './pages/WellPathOralHealthPage'
 import { WellPathFoodDietPage } from './pages/WellPathFoodDietPage'
+import { WellPathLabDataPage } from './pages/WellPathLabDataPage'
+import { AiPage } from './pages/AiPage'
+import { SettingsPage } from './pages/SettingsPage'
 import { AdminPage } from './pages/AdminPage'
-
-// ── Layout route shell for tab pages ──────────────────────────────
-
-function AppShell() {
-  return (
-    <AppLayout>
-      <Outlet />
-    </AppLayout>
-  )
-}
+import { AdminAiPage } from './pages/AdminAiPage'
+import { AdminPatientPage } from './pages/AdminPatientPage'
 
 // ── Authenticated app ─────────────────────────────────────────────
 
 function AuthenticatedApp() {
-  const [state, actions] = useHealthKit()
+  const { state, actions } = useHealthKitCtx()
 
   return (
     <Routes>
-      {/* All pages inside AppLayout with header + nav */}
-      <Route element={<AppShell />}>
+      {/* User pages → /user/* with AppLayout as layout route */}
+      <Route path="user" element={<AppLayout />}>
         <Route index element={<WellPathHomePage />} />
-        <Route path="steps" element={<StepsPage state={state} actions={actions} />} />
+        <Route path="steps" element={<StepsPage />} />
         <Route path="heart" element={<HeartPage state={state} actions={actions} />} />
         <Route path="activity" element={<ActivityPage state={state} actions={actions} />} />
         <Route path="food" element={<FoodLogScreen />}>
@@ -50,10 +45,21 @@ function AuthenticatedApp() {
         </Route>
         <Route path="oral-health" element={<WellPathOralHealthPage />} />
         <Route path="food-diet" element={<WellPathFoodDietPage />} />
+        <Route path="lab" element={<WellPathLabDataPage />} />
+        <Route path="ai" element={<AiPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+        {/* Admin routes inside same layout so TabBar works */}
         <Route path="admin" element={<AdminPage />} />
+        <Route path="admin/patient" element={<AdminPatientPage />} />
+        <Route path="admin/ai" element={<AdminAiPage />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Standalone /admin redirects into the layout route */}
+      <Route path="admin" element={<Navigate to="/user/admin" replace />} />
+
+      {/* Redirect root to /user */}
+      <Route index element={<Navigate to="/user" replace />} />
+      <Route path="*" element={<Navigate to="/user" replace />} />
     </Routes>
   )
 }
@@ -84,7 +90,9 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <HealthKitProvider>
+        <AppContent />
+      </HealthKitProvider>
     </AuthProvider>
   )
 }
