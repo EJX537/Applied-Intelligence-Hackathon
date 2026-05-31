@@ -15,7 +15,7 @@ export function ConsentScreen() {
         try {
             await grantConsent();
             const mealType = state.nextMealType ?? 'lunch';
-            navigate('/camera', { replace: true, state: { mealType } });
+            navigate('../camera', { replace: true, state: { mealType } });
         }
         catch {
             window.alert('Could not save consent. Please try again.');

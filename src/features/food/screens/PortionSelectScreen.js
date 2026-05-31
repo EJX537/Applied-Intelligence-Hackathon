@@ -95,7 +95,7 @@ export function PortionSelectScreen() {
                 corrections,
             };
             const response = await logMeal(req);
-            navigate('/meal-summary', { replace: true, state: { response } });
+            navigate('../meal-summary', { replace: true, state: { response } });
         }
         catch {
             window.alert('Could not log meal. Please try again.');

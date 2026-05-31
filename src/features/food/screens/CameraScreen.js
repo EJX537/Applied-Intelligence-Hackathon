@@ -28,7 +28,7 @@ export function CameraScreen() {
     const galleryInputRef = useRef(null);
     useEffect(() => {
         if (!consentLoading && hasConsent === false) {
-            navigate('/consent', { replace: true, state: { nextMealType: mealType } });
+            navigate('../consent', { replace: true, state: { nextMealType: mealType } });
         }
     }, [consentLoading, hasConsent, navigate, mealType]);
     const handleFile = async (file) => {
@@ -40,7 +40,7 @@ export function CameraScreen() {
             const result = await analyzeMealPhoto(base64, mealType);
             const imageUri = dataUrl || result.image_uri;
             setCurrentAnalysis(imageUri, result.items);
-            navigate('/portion-select', {
+            navigate('../portion-select', {
                 replace: true,
                 state: { items: result.items, imageUri, mealType },
             });
@@ -48,7 +48,7 @@ export function CameraScreen() {
         catch {
             const retake = window.confirm('Analysis failed. Click OK to choose another photo, or Cancel to enter manually.');
             if (!retake)
-                navigate('/manual-search', { replace: true, state: { mealType } });
+                navigate('../manual-search', { replace: true, state: { mealType } });
         }
         finally {
             setAnalyzing(false);
@@ -57,5 +57,5 @@ export function CameraScreen() {
     if (consentLoading || hasConsent === null) {
         return (_jsx("div", { className: "app-shell flex justify-center p-12", children: _jsx("span", { className: "text-[#666666]", children: "Loading\u2026" }) }));
     }
-    return (_jsxs("div", { className: "app-shell flex flex-col justify-center p-6", children: [_jsxs("h1", { className: "text-[24px] font-bold text-[#333333] text-center capitalize m-0", children: ["Log a ", mealType] }), _jsx("p", { className: "text-[14px] text-[#666666] text-center my-2 mb-8", children: "Upload a photo of your meal to get started." }), _jsx("input", { ref: cameraInputRef, type: "file", accept: "image/*", capture: "environment", hidden: true, onChange: (e) => handleFile(e.target.files?.[0]) }), _jsx("input", { ref: galleryInputRef, type: "file", accept: "image/*", hidden: true, onChange: (e) => handleFile(e.target.files?.[0]) }), analyzing ? (_jsx("div", { className: "text-center text-[#666666] text-[14px]", children: "Analyzing your meal\u2026" })) : (_jsxs(_Fragment, { children: [_jsx("button", { type: "button", onClick: () => cameraInputRef.current?.click(), className: "btn btn-primary mb-3", "aria-label": "Take photo with camera", children: "\uD83D\uDCF7 Take Photo" }), _jsx("button", { type: "button", onClick: () => galleryInputRef.current?.click(), className: "btn btn-secondary mb-3", "aria-label": "Choose photo from device", children: "\uD83D\uDDBC Choose from Device" }), _jsx("button", { type: "button", onClick: () => navigate('/manual-search', { replace: true, state: { mealType } }), className: "link-button mt-6 self-center", children: "Or search foods manually" })] }))] }));
+    return (_jsxs("div", { className: "app-shell flex flex-col justify-center p-6", children: [_jsxs("h1", { className: "text-[24px] font-bold text-[#333333] text-center capitalize m-0", children: ["Log a ", mealType] }), _jsx("p", { className: "text-[14px] text-[#666666] text-center my-2 mb-8", children: "Upload a photo of your meal to get started." }), _jsx("input", { ref: cameraInputRef, type: "file", accept: "image/*", capture: "environment", hidden: true, onChange: (e) => handleFile(e.target.files?.[0]) }), _jsx("input", { ref: galleryInputRef, type: "file", accept: "image/*", hidden: true, onChange: (e) => handleFile(e.target.files?.[0]) }), analyzing ? (_jsx("div", { className: "text-center text-[#666666] text-[14px]", children: "Analyzing your meal\u2026" })) : (_jsxs(_Fragment, { children: [_jsx("button", { type: "button", onClick: () => cameraInputRef.current?.click(), className: "btn btn-primary mb-3", "aria-label": "Take photo with camera", children: "\uD83D\uDCF7 Take Photo" }), _jsx("button", { type: "button", onClick: () => galleryInputRef.current?.click(), className: "btn btn-secondary mb-3", "aria-label": "Choose photo from device", children: "\uD83D\uDDBC Choose from Device" }), _jsx("button", { type: "button", onClick: () => navigate('../manual-search', { replace: true, state: { mealType } }), className: "link-button mt-6 self-center", children: "Or search foods manually" })] }))] }));
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useFoodStore } from '../store/foodStore';
 import { useDailyNutrition } from '../hooks/useDailyNutrition';
 import { DailySummary } from '../components/DailySummary';
@@ -29,6 +29,11 @@ function todayLabel(): string {
 
 export function FoodLogScreen() {
   const navigate = useNavigate();
+  const loc = useLocation();
+  const isRoot = loc.pathname === '/food' || loc.pathname.endsWith('/food');
+
+  if (!isRoot) return <Outlet />;
+
   const meals = useFoodStore((s) => s.meals);
   const removeMeal = useFoodStore((s) => s.removeMeal);
   const loadMeals = useFoodStore((s) => s.loadMeals);
@@ -44,8 +49,8 @@ export function FoodLogScreen() {
     const action = pendingAction;
     setPendingAction(null);
     setShowSheet(false);
-    if (action === 'photo') navigate('/camera', { state: { mealType: mt } });
-    else if (action === 'search') navigate('/manual-search', { state: { mealType: mt } });
+    if (action === 'photo') navigate('camera', { state: { mealType: mt } });
+    else if (action === 'search') navigate('manual-search', { state: { mealType: mt } });
   };
 
   return (

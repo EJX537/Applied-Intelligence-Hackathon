@@ -1,6 +1,6 @@
 import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useFoodStore } from '../store/foodStore';
 import { useDailyNutrition } from '../hooks/useDailyNutrition';
 import { DailySummary } from '../components/DailySummary';
@@ -24,6 +24,10 @@ function todayLabel() {
 }
 export function FoodLogScreen() {
     const navigate = useNavigate();
+    const loc = useLocation();
+    const isRoot = loc.pathname === '/food' || loc.pathname.endsWith('/food');
+    if (!isRoot)
+        return _jsx(Outlet, {});
     const meals = useFoodStore((s) => s.meals);
     const removeMeal = useFoodStore((s) => s.removeMeal);
     const loadMeals = useFoodStore((s) => s.loadMeals);
@@ -38,9 +42,9 @@ export function FoodLogScreen() {
         setPendingAction(null);
         setShowSheet(false);
         if (action === 'photo')
-            navigate('/camera', { state: { mealType: mt } });
+            navigate('camera', { state: { mealType: mt } });
         else if (action === 'search')
-            navigate('/manual-search', { state: { mealType: mt } });
+            navigate('manual-search', { state: { mealType: mt } });
     };
     return (_jsxs("div", { className: "app-shell", children: [_jsx("div", { className: "text-[14px] text-[#666666] mb-3", children: todayLabel() }), _jsx(DailySummary, { totals: dailyTotals, targets: DAILY_TARGETS }), _jsx("div", { className: "text-[15px] font-bold text-[#333333] mb-2", children: "Today's meals" }), meals.length === 0 ? (_jsx("div", { className: "text-[#666666] text-center mt-8", children: "No meals logged today \u2014 tap + to start" })) : (_jsx("div", { className: "pb-20", children: meals.map((m) => (_jsx(MealCard, { meal: m, onDelete: removeMeal }, m.id))) })), _jsx("button", { type: "button", onClick: () => setShowSheet(true), "aria-label": "Add a meal", className: "fixed right-[calc(50%-312px)] bottom-6 w-14 h-14 rounded-full bg-[#4CAF50] text-white text-[30px] font-light border-none shadow-[0_2px_8px_rgba(0,0,0,0.2)]", children: "+" }), showSheet && (_jsx("div", { role: "dialog", "aria-label": "Add a meal", className: "fixed inset-0 bg-black/40 flex items-end justify-center z-10", onClick: () => {
                     setShowSheet(false);

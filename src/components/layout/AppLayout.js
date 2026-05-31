@@ -8,10 +8,8 @@ function pathToTab(pathname) {
     const p = pathname.replace(/^\/#?/, '').split('/')[0];
     if (p === 'steps')
         return 'steps';
-    if (p === 'heart')
-        return 'heart';
-    if (p === 'activity')
-        return 'activity';
+    if (p === 'food')
+        return 'food';
     return 'dashboard';
 }
 export function AppLayout({ children }) {

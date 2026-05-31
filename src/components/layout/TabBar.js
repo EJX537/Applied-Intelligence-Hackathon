@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 const tabs = [
     { id: 'dashboard', icon: '◉', label: 'Dashboard', route: '/' },
     { id: 'steps', icon: '👣', label: 'Steps', route: '/steps' },
-    { id: 'heart', icon: '❤️', label: 'Heart', route: '/heart' },
-    { id: 'activity', icon: '🏃', label: 'Activity', route: '/activity' },
+    { id: 'food', icon: '🍽', label: 'Food', route: '/food' },
 ];
 export function TabBar({ active }) {
     const navigate = useNavigate();

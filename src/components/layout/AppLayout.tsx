@@ -8,8 +8,7 @@ import type { TabId } from './TabBar'
 function pathToTab(pathname: string): TabId {
   const p = pathname.replace(/^\/#?/, '').split('/')[0]
   if (p === 'steps') return 'steps'
-  if (p === 'heart') return 'heart'
-  if (p === 'activity') return 'activity'
+  if (p === 'food') return 'food'
   return 'dashboard'
 }
 
@@ -20,7 +19,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="absolute inset-0 flex flex-col overflow-hidden">
-      {/* ── Top bar (extends behind Dynamic Island) ── */}
+      {/* ── Top bar ── */}
       <header className="shrink-0 border-b border-[var(--color-border)] bg-[var(--color-bg)]/80 backdrop-blur-xl">
         {/* Notch/island spacer */}
         <div className="h-[env(safe-area-inset-top,0px)]" />

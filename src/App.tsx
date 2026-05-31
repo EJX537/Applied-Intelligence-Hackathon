@@ -31,21 +31,20 @@ function AuthenticatedApp() {
 
   return (
     <Routes>
-      {/* Tab-based pages (inside AppLayout with bottom nav) */}
+      {/* All pages inside AppLayout with header + nav */}
       <Route element={<AppShell />}>
         <Route index element={<DashboardPage state={state} actions={actions} />} />
         <Route path="steps" element={<StepsPage state={state} actions={actions} />} />
         <Route path="heart" element={<HeartPage state={state} actions={actions} />} />
         <Route path="activity" element={<ActivityPage state={state} actions={actions} />} />
+        <Route path="food" element={<FoodLogScreen />}>
+          <Route path="consent" element={<ConsentScreen />} />
+          <Route path="camera" element={<CameraScreen />} />
+          <Route path="portion-select" element={<PortionSelectScreen />} />
+          <Route path="manual-search" element={<ManualFoodSearchScreen />} />
+          <Route path="meal-summary" element={<MealSummaryScreen />} />
+        </Route>
       </Route>
-
-      {/* Food logging (full-screen, no tab bar) */}
-      <Route path="food" element={<FoodLogScreen />} />
-      <Route path="food/consent" element={<ConsentScreen />} />
-      <Route path="food/camera" element={<CameraScreen />} />
-      <Route path="food/portion-select" element={<PortionSelectScreen />} />
-      <Route path="food/manual-search" element={<ManualFoodSearchScreen />} />
-      <Route path="food/meal-summary" element={<MealSummaryScreen />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

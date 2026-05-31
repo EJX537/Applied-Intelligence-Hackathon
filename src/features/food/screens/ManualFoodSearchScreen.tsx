@@ -54,7 +54,7 @@ export function ManualFoodSearchScreen() {
       category: result.category,
       confidence: 'high',
     };
-    navigate('/portion-select', {
+    navigate('../portion-select', {
       replace: true,
       state: { items: [item], imageUri: null, mealType },
     });

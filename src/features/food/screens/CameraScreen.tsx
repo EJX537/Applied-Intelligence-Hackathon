@@ -37,7 +37,7 @@ export function CameraScreen() {
 
   useEffect(() => {
     if (!consentLoading && hasConsent === false) {
-      navigate('/consent', { replace: true, state: { nextMealType: mealType } });
+      navigate('../consent', { replace: true, state: { nextMealType: mealType } });
     }
   }, [consentLoading, hasConsent, navigate, mealType]);
 
@@ -49,7 +49,7 @@ export function CameraScreen() {
       const result = await analyzeMealPhoto(base64, mealType);
       const imageUri = dataUrl || result.image_uri;
       setCurrentAnalysis(imageUri, result.items);
-      navigate('/portion-select', {
+      navigate('../portion-select', {
         replace: true,
         state: { items: result.items, imageUri, mealType },
       });
@@ -57,7 +57,7 @@ export function CameraScreen() {
       const retake = window.confirm(
         'Analysis failed. Click OK to choose another photo, or Cancel to enter manually.',
       );
-      if (!retake) navigate('/manual-search', { replace: true, state: { mealType } });
+      if (!retake) navigate('../manual-search', { replace: true, state: { mealType } });
     } finally {
       setAnalyzing(false);
     }
@@ -126,7 +126,7 @@ export function CameraScreen() {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/manual-search', { replace: true, state: { mealType } })}
+            onClick={() => navigate('../manual-search', { replace: true, state: { mealType } })}
             className="link-button mt-6 self-center"
           >
             Or search foods manually
