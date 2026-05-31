@@ -1,7 +1,3 @@
-// Compact card summarizing a logged meal in the daily list.
-
-import React from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import type { MealEntry } from '../types';
 import { colors } from '../constants/colors';
 
@@ -24,80 +20,53 @@ function formatTime(iso: string): string {
 
 export function MealCard({ meal, onDelete }: Props) {
   const handleDelete = () => {
-    Alert.alert('Delete meal', 'Remove this meal from today\'s log?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => onDelete(meal.id) },
-    ]);
+    if (window.confirm("Remove this meal from today's log?")) {
+      onDelete(meal.id);
+    }
   };
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.icon}>{MEAL_ICONS[meal.meal_type]}</Text>
-      <View style={styles.body}>
-        <Text style={styles.title}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        background: colors.card,
+        padding: 12,
+        borderRadius: 12,
+        marginBottom: 8,
+        gap: 12,
+      }}
+    >
+      <span style={{ fontSize: 28 }}>{MEAL_ICONS[meal.meal_type]}</span>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: colors.text }}>
           {meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1)}
-        </Text>
-        <Text style={styles.meta}>
-          {formatTime(meal.timestamp)} · {meal.items.length} item{meal.items.length === 1 ? '' : 's'}
-        </Text>
-      </View>
-      <View style={styles.right}>
-        <Text style={styles.calories}>{meal.meal_total.calories} kcal</Text>
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={handleDelete}
-          accessibilityRole="button"
-          accessibilityLabel={`Delete ${meal.meal_type}`}
+        </div>
+        <div style={{ fontSize: 12, color: colors.textLight, marginTop: 2 }}>
+          {formatTime(meal.timestamp)} · {meal.items.length} item
+          {meal.items.length === 1 ? '' : 's'}
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: colors.primary }}>
+          {meal.meal_total.calories} kcal
+        </span>
+        <button
+          type="button"
+          onClick={handleDelete}
+          aria-label={`Delete ${meal.meal_type}`}
+          style={{
+            color: colors.danger,
+            background: 'transparent',
+            border: 'none',
+            fontSize: 12,
+            fontWeight: 600,
+            padding: '4px 8px',
+          }}
         >
-          <Text style={styles.deleteText}>Delete</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          Delete
+        </button>
+      </div>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 8,
-    gap: 12,
-  },
-  icon: {
-    fontSize: 28,
-  },
-  body: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  meta: {
-    fontSize: 12,
-    color: colors.textLight,
-    marginTop: 2,
-  },
-  right: {
-    alignItems: 'flex-end',
-    gap: 6,
-  },
-  calories: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  deleteButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  deleteText: {
-    color: colors.danger,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-});

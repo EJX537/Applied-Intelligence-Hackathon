@@ -2,16 +2,34 @@ node_modules/
 .expo/
 dist/
 npm-debug.*
+
+# Logs
+logs
+*.log
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Vite cache
+.vite/
+
+# Expo / React Native artifacts (ok to keep even if app is now web-only)
+.expo/
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
-*.orig.*
+
+# Misc build outputs
 web-build/
+coverage/
+
+# Env
 .env
 .env.local
 .env.*.local
+.env.*
 
 # macOS
 .DS_Store

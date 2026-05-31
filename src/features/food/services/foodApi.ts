@@ -1,7 +1,9 @@
 // Food API service: meal analysis, logging, and food search.
-// Supports MOCK_MODE for development without a backend.
+// analyze + search stay mocked for the hackathon demo; logMeal + fetchMeals
+// persist to Insforge so meals survive an app restart.
 
 import apiClient from '../../../shared/api/client';
+import { insforge } from '../../../shared/api/insforgeClient';
 import type {
   AnalyzeResponse,
   LogMealRequest,
@@ -185,12 +187,81 @@ export async function analyzeMealPhoto(
 }
 
 export async function logMeal(data: LogMealRequest): Promise<LogMealResponse> {
-  if (MOCK_MODE) {
-    await new Promise((r) => setTimeout(r, 400));
-    return mockLogMeal(data);
+  // Build the meal locally (calorie math) using the mock helper.
+  const response = mockLogMeal(data);
+
+  // Persist to Insforge. Failure here should not block the demo — fall back
+  // to in-memory and surface a console warning.
+  try {
+    const { error } = await insforge.database.from('meals').insert([
+      {
+        id: response.meal.id,
+        meal_type: response.meal.meal_type,
+        timestamp: response.meal.timestamp,
+        image_uri: response.meal.image_uri,
+        meal_total: response.meal.meal_total,
+        items: response.meal.items,
+      },
+    ]);
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.warn('[insforge] meals.insert failed', error);
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('[insforge] meals.insert threw', e);
   }
-  const { data: response } = await apiClient.post<LogMealResponse>('/meals/log', data);
+
   return response;
+}
+
+export async function deleteMeal(mealId: string): Promise<void> {
+  try {
+    const { error } = await insforge.database.from('meals').delete().eq('id', mealId);
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.warn('[insforge] meals.delete failed', error);
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('[insforge] meals.delete threw', e);
+  }
+}
+
+interface InsforgeMealRow {
+  id: string;
+  meal_type: MealEntry['meal_type'];
+  timestamp: string;
+  image_uri: string | null;
+  meal_total: NutritionTotals;
+  items: FoodItem[];
+}
+
+export async function fetchMeals(): Promise<MealEntry[]> {
+  try {
+    const { data, error } = await insforge.database
+      .from('meals')
+      .select('*')
+      .order('timestamp', { ascending: false });
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.warn('[insforge] meals.select failed', error);
+      return [];
+    }
+    const rows = (data ?? []) as InsforgeMealRow[];
+    return rows.map((r) => ({
+      id: r.id,
+      meal_type: r.meal_type,
+      timestamp: r.timestamp,
+      image_uri: r.image_uri,
+      items: r.items,
+      meal_total: r.meal_total,
+    }));
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('[insforge] meals.select threw', e);
+    return [];
+  }
 }
 
 export async function searchFood(query: string): Promise<SearchFoodResponse> {

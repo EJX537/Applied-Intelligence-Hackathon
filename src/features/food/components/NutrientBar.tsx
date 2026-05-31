@@ -1,7 +1,3 @@
-// Horizontal progress bar for a single nutrient toward its daily target.
-
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import { colors } from '../constants/colors';
 
 interface Props {
@@ -18,50 +14,35 @@ export function NutrientBar({ label, value, target, unit, color }: Props) {
   const percentLabel = Math.round(ratio * 100);
 
   return (
-    <View
-      style={styles.container}
-      accessibilityLabel={`${label}: ${value} of ${target} ${unit}, ${percentLabel} percent`}
+    <div
+      style={{ margin: '6px 0' }}
+      aria-label={`${label}: ${value} of ${target} ${unit}, ${percentLabel} percent`}
     >
-      <View style={styles.header}>
-        <Text style={styles.label}>{label}</Text>
-        <Text style={styles.value}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+        <span style={{ fontSize: 13, color: colors.text, fontWeight: 600 }}>{label}</span>
+        <span style={{ fontSize: 12, color: colors.textLight }}>
           {value}/{target}
           {unit}
-        </Text>
-      </View>
-      <View style={styles.track}>
-        <View style={[styles.fill, { width: `${widthPct}%`, backgroundColor: color }]} />
-      </View>
-    </View>
+        </span>
+      </div>
+      <div
+        style={{
+          height: 8,
+          background: colors.border,
+          borderRadius: 4,
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            height: '100%',
+            width: `${widthPct}%`,
+            background: color,
+            borderRadius: 4,
+            transition: 'width 200ms ease',
+          }}
+        />
+      </div>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: 6,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 4,
-  },
-  label: {
-    fontSize: 13,
-    color: colors.text,
-    fontWeight: '600',
-  },
-  value: {
-    fontSize: 12,
-    color: colors.textLight,
-  },
-  track: {
-    height: 8,
-    backgroundColor: colors.border,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  fill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-});

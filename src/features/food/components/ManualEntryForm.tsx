@@ -1,7 +1,4 @@
-// Manual nutrition entry form for items the API could not enrich.
-
-import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
 import { colors } from '../constants/colors';
 
 interface ManualNutrients {
@@ -37,131 +34,114 @@ export function ManualEntryForm({ itemName, onSubmit, onSkip }: Props) {
     });
   };
 
-  return (
-    <View style={styles.card}>
-      <Text style={styles.title}>Add nutrition for: {itemName}</Text>
-      <View style={styles.row}>
-        <Text style={styles.label}>Calories</Text>
-        <TextInput
-          style={styles.input}
-          value={calories}
-          onChangeText={setCalories}
-          keyboardType="numeric"
-          placeholder="0"
-          accessibilityLabel={`Calories for ${itemName}`}
-        />
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.label}>Protein (g)</Text>
-        <TextInput
-          style={styles.input}
-          value={protein}
-          onChangeText={setProtein}
-          keyboardType="numeric"
-          placeholder="0"
-          accessibilityLabel={`Protein grams for ${itemName}`}
-        />
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.label}>Carbs (g)</Text>
-        <TextInput
-          style={styles.input}
-          value={carbs}
-          onChangeText={setCarbs}
-          keyboardType="numeric"
-          placeholder="0"
-          accessibilityLabel={`Carbs grams for ${itemName}`}
-        />
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.label}>Fat (g)</Text>
-        <TextInput
-          style={styles.input}
-          value={fat}
-          onChangeText={setFat}
-          keyboardType="numeric"
-          placeholder="0"
-          accessibilityLabel={`Fat grams for ${itemName}`}
-        />
-      </View>
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={[styles.button, styles.saveButton]}
-          onPress={handleSave}
-          accessibilityRole="button"
-          accessibilityLabel={`Save nutrition for ${itemName}`}
-        >
-          <Text style={styles.saveText}>Save</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, styles.skipButton]}
-          onPress={onSkip}
-          accessibilityRole="button"
-          accessibilityLabel={`Skip and log ${itemName} without nutrition`}
-        >
-          <Text style={styles.skipText}>Skip — log without nutrition</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 8,
-  },
-  title: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 12,
-  },
-  row: {
-    flexDirection: 'row',
+  const rowStyle: React.CSSProperties = {
+    display: 'flex',
     alignItems: 'center',
     marginBottom: 10,
-  },
-  label: {
+  };
+  const labelStyle: React.CSSProperties = {
     width: 100,
     fontSize: 13,
     color: colors.textLight,
-  },
-  input: {
+  };
+  const inputStyle: React.CSSProperties = {
     flex: 1,
     height: 40,
-    borderWidth: 1,
-    borderColor: colors.border,
+    border: `1px solid ${colors.border}`,
     borderRadius: 8,
-    paddingHorizontal: 10,
-    backgroundColor: '#FAFAFA',
+    padding: '0 10px',
+    background: '#fafafa',
     color: colors.text,
-  },
-  actions: {
-    marginTop: 8,
-    gap: 8,
-  },
-  button: {
-    height: 44,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveButton: {
-    backgroundColor: colors.primary,
-  },
-  saveText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  skipButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  skipText: {
-    color: colors.textLight,
-  },
-});
+    fontSize: 14,
+  };
+
+  return (
+    <div
+      style={{
+        background: colors.card,
+        borderRadius: 12,
+        padding: 16,
+        margin: '8px 0',
+      }}
+    >
+      <div style={{ fontSize: 15, fontWeight: 600, color: colors.text, marginBottom: 12 }}>
+        Add nutrition for: {itemName}
+      </div>
+      <div style={rowStyle}>
+        <span style={labelStyle}>Calories</span>
+        <input
+          type="number"
+          value={calories}
+          onChange={(e) => setCalories(e.target.value)}
+          placeholder="0"
+          aria-label={`Calories for ${itemName}`}
+          style={inputStyle}
+        />
+      </div>
+      <div style={rowStyle}>
+        <span style={labelStyle}>Protein (g)</span>
+        <input
+          type="number"
+          value={protein}
+          onChange={(e) => setProtein(e.target.value)}
+          placeholder="0"
+          aria-label={`Protein grams for ${itemName}`}
+          style={inputStyle}
+        />
+      </div>
+      <div style={rowStyle}>
+        <span style={labelStyle}>Carbs (g)</span>
+        <input
+          type="number"
+          value={carbs}
+          onChange={(e) => setCarbs(e.target.value)}
+          placeholder="0"
+          aria-label={`Carbs grams for ${itemName}`}
+          style={inputStyle}
+        />
+      </div>
+      <div style={rowStyle}>
+        <span style={labelStyle}>Fat (g)</span>
+        <input
+          type="number"
+          value={fat}
+          onChange={(e) => setFat(e.target.value)}
+          placeholder="0"
+          aria-label={`Fat grams for ${itemName}`}
+          style={inputStyle}
+        />
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+        <button
+          type="button"
+          onClick={handleSave}
+          aria-label={`Save nutrition for ${itemName}`}
+          style={{
+            height: 44,
+            borderRadius: 10,
+            background: colors.primary,
+            color: '#fff',
+            fontWeight: 600,
+            border: 'none',
+          }}
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={onSkip}
+          aria-label={`Skip and log ${itemName} without nutrition`}
+          style={{
+            height: 44,
+            borderRadius: 10,
+            background: 'transparent',
+            color: colors.textLight,
+            border: `1px solid ${colors.border}`,
+          }}
+        >
+          Skip — log without nutrition
+        </button>
+      </div>
+    </div>
+  );
+}

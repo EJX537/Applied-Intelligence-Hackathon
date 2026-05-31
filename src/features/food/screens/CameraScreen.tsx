@@ -1,212 +1,154 @@
-// Photo capture & gallery entry point for meal logging.
-
-import React, { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {
-  launchCamera,
-  launchImageLibrary,
-  type Asset,
-  type ImagePickerResponse,
-} from 'react-native-image-picker';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useConsentStatus } from '../hooks/useConsentStatus';
 import { useFoodStore } from '../store/foodStore';
 import { analyzeMealPhoto } from '../services/foodApi';
 import { colors } from '../constants/colors';
-import type { FoodScreenProps } from '../navigation/types';
+import type { MealType } from '../types';
 
-export function CameraScreen({ navigation, route }: FoodScreenProps<'Camera'>) {
-  const { mealType } = route.params;
+interface LocationState {
+  mealType?: MealType;
+}
+
+function fileToBase64(file: File): Promise<{ base64: string; dataUrl: string }> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      const base64 = dataUrl.split(',')[1] ?? '';
+      resolve({ base64, dataUrl });
+    };
+    reader.onerror = () => reject(reader.error ?? new Error('Read failed'));
+    reader.readAsDataURL(file);
+  });
+}
+
+export function CameraScreen() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = (location.state ?? {}) as LocationState;
+  const mealType = state.mealType ?? 'lunch';
+
   const { hasConsent, loading: consentLoading } = useConsentStatus();
   const setCurrentAnalysis = useFoodStore((s) => s.setCurrentAnalysis);
   const [analyzing, setAnalyzing] = useState<boolean>(false);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
+  const galleryInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (!consentLoading && hasConsent === false) {
-      navigation.replace('Consent', { nextMealType: mealType });
+      navigate('/consent', { replace: true, state: { nextMealType: mealType } });
     }
-  }, [consentLoading, hasConsent, navigation, mealType]);
+  }, [consentLoading, hasConsent, navigate, mealType]);
 
-  const handleAnalyze = async (uri: string | undefined, base64: string | undefined) => {
-    if (!uri || !base64) {
-      Alert.alert('Image error', 'Could not read image data.');
-      return;
-    }
+  const handleFile = async (file: File | undefined) => {
+    if (!file) return;
     setAnalyzing(true);
     try {
+      const { base64, dataUrl } = await fileToBase64(file);
       const result = await analyzeMealPhoto(base64, mealType);
-      const imageUri = uri || result.image_uri;
+      const imageUri = dataUrl || result.image_uri;
       setCurrentAnalysis(imageUri, result.items);
-      navigation.replace('PortionSelect', {
-        items: result.items,
-        imageUri,
-        mealType,
+      navigate('/portion-select', {
+        replace: true,
+        state: { items: result.items, imageUri, mealType },
       });
-    } catch (e) {
-      Alert.alert('Analysis failed', 'We could not identify the food in your photo.', [
-        { text: 'Retake Photo', onPress: handleTakePhoto },
-        { text: 'Add Manually', onPress: () => navigation.replace('ManualFoodSearch', { mealType }) },
-        { text: 'Cancel', style: 'cancel' },
-      ]);
+    } catch {
+      const retake = window.confirm(
+        'Analysis failed. Click OK to choose another photo, or Cancel to enter manually.',
+      );
+      if (!retake) navigate('/manual-search', { replace: true, state: { mealType } });
     } finally {
       setAnalyzing(false);
     }
   };
 
-  const processResponse = async (response: ImagePickerResponse) => {
-    if (response.didCancel) return;
-    if (response.errorCode) {
-      Alert.alert('Image picker error', response.errorMessage ?? 'Unknown error');
-      return;
-    }
-    const asset: Asset | undefined = response.assets?.[0];
-    if (!asset) return;
-    await handleAnalyze(asset.uri, asset.base64);
-  };
-
-  const handleTakePhoto = async () => {
-    const response = await launchCamera({
-      mediaType: 'photo',
-      quality: 0.6,
-      includeBase64: true,
-      saveToPhotos: false,
-    });
-    await processResponse(response);
-  };
-
-  const handleChooseGallery = async () => {
-    const response = await launchImageLibrary({
-      mediaType: 'photo',
-      quality: 0.6,
-      includeBase64: true,
-      selectionLimit: 1,
-    });
-    await processResponse(response);
-  };
-
   if (consentLoading || hasConsent === null) {
     return (
-      <SafeAreaView style={styles.safe}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </SafeAreaView>
+      <div className="app-shell" style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
+        <span style={{ color: colors.textLight }}>Loading…</span>
+      </div>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Log a {mealType}</Text>
-        <Text style={styles.subtitle}>Snap a photo of your meal to get started.</Text>
+    <div
+      className="app-shell"
+      style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 24 }}
+    >
+      <h1
+        style={{
+          fontSize: 24,
+          fontWeight: 700,
+          color: colors.text,
+          textAlign: 'center',
+          textTransform: 'capitalize',
+          margin: 0,
+        }}
+      >
+        Log a {mealType}
+      </h1>
+      <p
+        style={{
+          fontSize: 14,
+          color: colors.textLight,
+          textAlign: 'center',
+          margin: '8px 0 32px',
+        }}
+      >
+        Upload a photo of your meal to get started.
+      </p>
 
-        {analyzing ? (
-          <View style={styles.analyzing}>
-            <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.analyzingText}>Analyzing your meal…</Text>
-          </View>
-        ) : (
-          <>
-            <TouchableOpacity
-              style={[styles.button, styles.primaryButton]}
-              onPress={handleTakePhoto}
-              accessibilityRole="button"
-              accessibilityLabel="Take photo with camera"
-            >
-              <Text style={styles.primaryButtonText}>📷 Take Photo</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.secondaryButton]}
-              onPress={handleChooseGallery}
-              accessibilityRole="button"
-              accessibilityLabel="Choose photo from gallery"
-            >
-              <Text style={styles.secondaryButtonText}>🖼 Choose from Gallery</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.link}
-              onPress={() => navigation.replace('ManualFoodSearch', { mealType })}
-              accessibilityRole="link"
-              accessibilityLabel="Search foods manually"
-            >
-              <Text style={styles.linkText}>Or search foods manually</Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
-    </SafeAreaView>
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        hidden
+        onChange={(e) => handleFile(e.target.files?.[0])}
+      />
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={(e) => handleFile(e.target.files?.[0])}
+      />
+
+      {analyzing ? (
+        <div style={{ textAlign: 'center', color: colors.textLight, fontSize: 14 }}>
+          Analyzing your meal…
+        </div>
+      ) : (
+        <>
+          <button
+            type="button"
+            onClick={() => cameraInputRef.current?.click()}
+            className="btn btn-primary"
+            style={{ marginBottom: 12 }}
+            aria-label="Take photo with camera"
+          >
+            📷 Take Photo
+          </button>
+          <button
+            type="button"
+            onClick={() => galleryInputRef.current?.click()}
+            className="btn btn-secondary"
+            style={{ marginBottom: 12 }}
+            aria-label="Choose photo from device"
+          >
+            🖼 Choose from Device
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/manual-search', { replace: true, state: { mealType } })}
+            className="link-button"
+            style={{ marginTop: 24, alignSelf: 'center' }}
+          >
+            Or search foods manually
+          </button>
+        </>
+      )}
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-    textAlign: 'center',
-    textTransform: 'capitalize',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: colors.textLight,
-    textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 32,
-  },
-  button: {
-    height: 54,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  primaryButton: {
-    backgroundColor: colors.primary,
-  },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  secondaryButtonText: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  link: {
-    marginTop: 24,
-    alignItems: 'center',
-  },
-  linkText: {
-    color: colors.secondary,
-    fontSize: 14,
-    textDecorationLine: 'underline',
-  },
-  analyzing: {
-    alignItems: 'center',
-    gap: 12,
-  },
-  analyzingText: {
-    color: colors.textLight,
-    fontSize: 14,
-  },
-});

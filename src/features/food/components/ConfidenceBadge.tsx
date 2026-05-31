@@ -1,7 +1,3 @@
-// Visual indicator for AI recognition confidence on a food item.
-
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import { colors } from '../constants/colors';
 
 interface Props {
@@ -13,32 +9,29 @@ export function ConfidenceBadge({ confidence }: Props) {
 
   if (confidence === 'medium') {
     return (
-      <View style={styles.badge} accessibilityLabel="Medium confidence">
-        <Text style={[styles.icon, { color: colors.warning }]}>!</Text>
-      </View>
+      <span
+        aria-label="Medium confidence"
+        style={{ color: colors.warning, fontSize: 14, fontWeight: 700 }}
+      >
+        !
+      </span>
     );
   }
 
   return (
-    <View style={styles.badge} accessibilityLabel="Low confidence">
-      <Text style={[styles.icon, { color: colors.danger }]}>x</Text>
-      <Text style={[styles.label, { color: colors.danger }]}>Low confidence</Text>
-    </View>
+    <span
+      aria-label="Low confidence"
+      style={{
+        display: 'inline-flex',
+        gap: 4,
+        alignItems: 'center',
+        color: colors.danger,
+        fontWeight: 600,
+        fontSize: 12,
+      }}
+    >
+      <span style={{ fontSize: 14, fontWeight: 700 }}>x</span>
+      Low confidence
+    </span>
   );
 }
-
-const styles = StyleSheet.create({
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  icon: {
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-});

@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import type { MealEntry, NutritionTotals, RecognizedItem } from '../types';
+import { fetchMeals, deleteMeal } from '../services/foodApi';
 
 const EMPTY_TOTALS: NutritionTotals = {
   calories: 0,
@@ -17,10 +18,12 @@ interface FoodState {
   meals: MealEntry[];
   currentItems: RecognizedItem[];
   currentImageUri: string | null;
+  mealsLoaded: boolean;
   setCurrentAnalysis: (imageUri: string, items: RecognizedItem[]) => void;
   addMeal: (meal: MealEntry) => void;
   removeMeal: (mealId: string) => void;
   clearCurrentAnalysis: () => void;
+  loadMeals: () => Promise<void>;
   getDailyTotals: () => NutritionTotals;
 }
 
@@ -28,11 +31,22 @@ export const useFoodStore = create<FoodState>((set, get) => ({
   meals: [],
   currentItems: [],
   currentImageUri: null,
+  mealsLoaded: false,
   setCurrentAnalysis: (imageUri, items) =>
     set({ currentImageUri: imageUri, currentItems: items }),
-  addMeal: (meal) => set((s) => ({ meals: [meal, ...s.meals] })),
-  removeMeal: (mealId) => set((s) => ({ meals: s.meals.filter((m) => m.id !== mealId) })),
+  addMeal: (meal) =>
+    set((s) =>
+      s.meals.some((m) => m.id === meal.id) ? s : { meals: [meal, ...s.meals] },
+    ),
+  removeMeal: (mealId) => {
+    set((s) => ({ meals: s.meals.filter((m) => m.id !== mealId) }));
+    void deleteMeal(mealId);
+  },
   clearCurrentAnalysis: () => set({ currentImageUri: null, currentItems: [] }),
+  loadMeals: async () => {
+    const meals = await fetchMeals();
+    set({ meals, mealsLoaded: true });
+  },
   getDailyTotals: () =>
     get().meals.reduce<NutritionTotals>(
       (acc, m) => ({

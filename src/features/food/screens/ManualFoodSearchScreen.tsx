@@ -1,24 +1,20 @@
-// Debounced text search against USDA-backed food lookup.
-
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import debounce from 'lodash/debounce';
 import { searchFood } from '../services/foodApi';
 import { colors } from '../constants/colors';
-import type { SearchFoodResult, RecognizedItem } from '../types';
-import type { FoodScreenProps } from '../navigation/types';
+import type { MealType, SearchFoodResult, RecognizedItem } from '../types';
 
-export function ManualFoodSearchScreen({ navigation, route }: FoodScreenProps<'ManualFoodSearch'>) {
-  const { mealType } = route.params;
+interface LocationState {
+  mealType?: MealType;
+}
+
+export function ManualFoodSearchScreen() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = (location.state ?? {}) as LocationState;
+  const mealType = state.mealType ?? 'lunch';
+
   const [query, setQuery] = useState<string>('');
   const [results, setResults] = useState<SearchFoodResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -37,7 +33,7 @@ export function ManualFoodSearchScreen({ navigation, route }: FoodScreenProps<'M
     try {
       const response = await searchFood(q.trim());
       if (requestId === requestIdRef.current) setResults(response.results);
-    } catch (e) {
+    } catch {
       if (requestId === requestIdRef.current) setError('Search failed. Try again.');
     } finally {
       if (requestId === requestIdRef.current) setLoading(false);
@@ -58,76 +54,60 @@ export function ManualFoodSearchScreen({ navigation, route }: FoodScreenProps<'M
       category: result.category,
       confidence: 'high',
     };
-    navigation.replace('PortionSelect', {
-      items: [item],
-      imageUri: null,
-      mealType,
+    navigate('/portion-select', {
+      replace: true,
+      state: { items: [item], imageUri: null, mealType },
     });
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
-        <TextInput
-          style={styles.input}
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Search foods…"
-          returnKeyType="search"
-          autoFocus
-          accessibilityLabel="Search foods"
-        />
-        {loading && <ActivityIndicator style={styles.loader} color={colors.primary} />}
-        {error && <Text style={styles.error}>{error}</Text>}
-        {!loading && !error && query.trim().length === 0 && (
-          <Text style={styles.empty}>Start typing to search foods</Text>
-        )}
-        <FlatList
-          data={results}
-          keyExtractor={(item) => String(item.fdc_id)}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.result}
-              onPress={() => handleSelect(item)}
-              accessibilityRole="button"
-              accessibilityLabel={`Select ${item.name}`}
-            >
-              <Text style={styles.resultName}>{item.name}</Text>
-              <Text style={styles.resultMeta}>
-                {item.category} · {item.nutrients_per_100g.calories} kcal / 100g
-              </Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
-    </SafeAreaView>
+    <div className="app-shell" style={{ display: 'flex', flexDirection: 'column' }}>
+      <input
+        className="input"
+        type="search"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search foods…"
+        autoFocus
+        aria-label="Search foods"
+      />
+      {loading && (
+        <div style={{ margin: '16px 0', color: colors.textLight }}>Searching…</div>
+      )}
+      {error && (
+        <div style={{ color: colors.danger, margin: '12px 0', textAlign: 'center' }}>{error}</div>
+      )}
+      {!loading && !error && query.trim().length === 0 && (
+        <div style={{ color: colors.textLight, textAlign: 'center', marginTop: 32 }}>
+          Start typing to search foods
+        </div>
+      )}
+      <div style={{ padding: '12px 0' }}>
+        {results.map((item) => (
+          <button
+            type="button"
+            key={item.fdc_id}
+            onClick={() => handleSelect(item)}
+            aria-label={`Select ${item.name}`}
+            style={{
+              display: 'block',
+              width: '100%',
+              textAlign: 'left',
+              background: colors.card,
+              padding: 14,
+              borderRadius: 10,
+              marginBottom: 8,
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <div style={{ fontSize: 15, fontWeight: 600, color: colors.text }}>{item.name}</div>
+            <div style={{ fontSize: 12, color: colors.textLight, marginTop: 4 }}>
+              {item.category} · {item.nutrients_per_100g.calories} kcal / 100g
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  container: { flex: 1, padding: 16 },
-  input: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    backgroundColor: colors.card,
-    color: colors.text,
-    fontSize: 16,
-  },
-  loader: { marginVertical: 16 },
-  error: { color: colors.danger, marginVertical: 12, textAlign: 'center' },
-  empty: { color: colors.textLight, textAlign: 'center', marginTop: 32 },
-  list: { paddingVertical: 12 },
-  result: {
-    backgroundColor: colors.card,
-    padding: 14,
-    borderRadius: 10,
-    marginBottom: 8,
-  },
-  resultName: { fontSize: 15, fontWeight: '600', color: colors.text },
-  resultMeta: { fontSize: 12, color: colors.textLight, marginTop: 4 },
-});
