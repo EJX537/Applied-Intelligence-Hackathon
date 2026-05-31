@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import debounce from 'lodash/debounce';
 import { searchFood } from '../services/foodApi';
-import { colors } from '../constants/colors';
+
 import type { MealType, SearchFoodResult, RecognizedItem } from '../types';
 
 interface LocationState {
@@ -54,7 +54,7 @@ export function ManualFoodSearchScreen() {
       category: result.category,
       confidence: 'high',
     };
-    navigate('/portion-select', {
+    navigate('../portion-select', {
       replace: true,
       state: { items: [item], imageUri: null, mealType },
     });
@@ -72,6 +72,7 @@ export function ManualFoodSearchScreen() {
         aria-label="Search foods"
       />
       {loading && (
+<<<<<<< HEAD
         <div className="my-4 text-text-light">Searching…</div>
       )}
       {error && (
@@ -79,6 +80,15 @@ export function ManualFoodSearchScreen() {
       )}
       {!loading && !error && query.trim().length === 0 && (
         <div className="text-text-light text-center mt-8">
+=======
+        <div className="my-4 text-[#666666]">Searching…</div>
+      )}
+      {error && (
+        <div className="text-[#F44336] my-3 text-center">{error}</div>
+      )}
+      {!loading && !error && query.trim().length === 0 && (
+        <div className="text-[#666666] text-center mt-8">
+>>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
           Start typing to search foods
         </div>
       )}
@@ -89,10 +99,17 @@ export function ManualFoodSearchScreen() {
             key={item.fdc_id}
             onClick={() => handleSelect(item)}
             aria-label={`Select ${item.name}`}
+<<<<<<< HEAD
             className="block w-full text-left bg-card-app p-3.5 rounded-[10px] mb-2 border-none cursor-pointer active:scale-[0.98] transition-transform"
           >
             <div className="text-[15px] font-semibold text-text-app">{item.name}</div>
             <div className="text-xs text-text-light mt-1">
+=======
+            className="block w-full text-left bg-white p-3.5 rounded-xl mb-2 border-none cursor-pointer"
+          >
+            <div className="text-[15px] font-semibold text-[#333333]">{item.name}</div>
+            <div className="text-[12px] text-[#666666] mt-1">
+>>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
               {item.category} · {item.nutrients_per_100g.calories} kcal / 100g
             </div>
           </button>

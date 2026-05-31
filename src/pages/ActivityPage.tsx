@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import type { HealthKitState, HealthKitActions } from '../hooks/useHealthKit'
 import type { WorkoutActivityType } from '@pwa-kit/sdk'
+import { summarizeWorkouts, summarizeSleep } from '../lib/chart-data'
 
 const NF = new Intl.NumberFormat('en-US')
+const MIN = new Intl.NumberFormat('en-US', { style: 'unit', unit: 'minute', unitDisplay: 'narrow' })
 
 function d(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
@@ -22,10 +25,8 @@ export function ActivityPage({ state, actions }: { state: HealthKitState; action
   const { authorized, loading, workouts, sleepSamples } = state
   const [maxSamples] = useState(20)
 
-  const sleepByStage = sleepSamples.reduce<Record<string, number>>((acc, s) => {
-    acc[s.stage] = (acc[s.stage] || 0) + 1
-    return acc
-  }, {})
+  const workoutSummary = useMemo(() => summarizeWorkouts(workouts), [workouts])
+  const sleepSummary = useMemo(() => summarizeSleep(sleepSamples), [sleepSamples])
 
   return (
     <div className="pt-4 space-y-4">
@@ -48,6 +49,52 @@ export function ActivityPage({ state, actions }: { state: HealthKitState; action
             30 days
           </button>
         </div>
+
+        {/* Workout type breakdown */}
+        {workoutSummary.length > 0 && (
+          <div className="rounded-xl bg-orange-500/4 border border-orange-500/10 p-2 mb-3">
+            <p className="text-xs font-medium text-[var(--color-text)] mb-2 px-1">Duration by type</p>
+            <ResponsiveContainer width="100%" height={workoutSummary.length * 36 + 16}>
+              <BarChart
+                data={workoutSummary}
+                layout="vertical"
+                margin={{ top: 4, right: 48, bottom: 4, left: 0 }}
+              >
+                <XAxis type="number" hide />
+                <YAxis
+                  type="category"
+                  dataKey="type"
+                  tick={{ fontSize: 11, fill: 'var(--color-text)' }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={80}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: 'var(--color-bg)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                  formatter={(_v, _n, props: any) => [`${MIN.format(props.payload.totalMinutes)} · ${props.payload.count} session${props.payload.count > 1 ? 's' : ''}${props.payload.totalCalories ? ` · ${NF.format(props.payload.totalCalories)} kcal` : ''}`, 'Duration']}
+                  labelFormatter={() => ''}
+                />
+                <Bar
+                  dataKey="totalMinutes"
+                  fill="#f97316"
+                  radius={[0, 4, 4, 0]}
+                  maxBarSize={20}
+                  label={{
+                    position: 'right',
+                    fontSize: 11,
+                    fill: 'var(--color-text)',
+                    formatter: (v: any) => MIN.format(Number(v)),
+                  }}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
 
         {workouts.length > 0 && (
           <div>
@@ -92,18 +139,58 @@ export function ActivityPage({ state, actions }: { state: HealthKitState; action
           </button>
         </div>
 
-        {Object.keys(sleepByStage).length > 0 && (
+        {/* Sleep stage breakdown */}
+        {sleepSummary.length > 0 && (
+          <div className="rounded-xl bg-indigo-500/4 border border-indigo-500/10 p-2 mb-3">
+            <p className="text-xs font-medium text-[var(--color-text)] mb-2 px-1">Sleep stages</p>
+            <ResponsiveContainer width="100%" height={sleepSummary.length * 36 + 16}>
+              <BarChart
+                data={sleepSummary}
+                layout="vertical"
+                margin={{ top: 4, right: 48, bottom: 4, left: 0 }}
+              >
+                <XAxis type="number" hide />
+                <YAxis
+                  type="category"
+                  dataKey="stage"
+                  tick={{ fontSize: 11, fill: 'var(--color-text)' }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={72}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: 'var(--color-bg)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                  formatter={(_v, _n, props: any) => [`${MIN.format(props.payload.totalMinutes)} · ${props.payload.count} samples`, 'Duration']}
+                  labelFormatter={() => ''}
+                />
+                <Bar
+                  dataKey="totalMinutes"
+                  fill="#6366f1"
+                  radius={[0, 4, 4, 0]}
+                  maxBarSize={20}
+                  label={{
+                    position: 'right',
+                    fontSize: 11,
+                    fill: 'var(--color-text)',
+                    formatter: (v: any) => MIN.format(Number(v)),
+                  }}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {Object.keys(sleepSummary).length > 0 && (
           <div>
             <div className="flex justify-between text-xs font-medium px-3 py-2 bg-[var(--color-code-bg)] rounded-lg mb-1 text-[var(--color-text)]">
               <span>{sleepSamples.length} samples</span>
-              <span>{Object.keys(sleepByStage).length} stages</span>
+              <span>{sleepSummary.length} stages</span>
             </div>
-            {Object.entries(sleepByStage).map(([stage, count]) => (
-              <div key={stage} className="flex gap-2 items-center py-1 px-2.5 font-mono text-xs border-b border-gray-500/10 last:border-b-0">
-                <span className="text-[var(--color-text-h)]">{stage}</span>
-                <span className="flex-1 text-right text-[var(--color-text)]">{count} entries</span>
-              </div>
-            ))}
             {sleepSamples.length > 0 && (
               <details className="mt-2 text-xs">
                 <summary className="cursor-pointer opacity-60 hover:opacity-100 hover:text-indigo-500 py-1 select-none">

@@ -12,16 +12,28 @@
   "dependencies": {
     "@insforge/sdk": "^1.3.0",
     "@pwa-kit/sdk": "^0.1.2",
+<<<<<<< HEAD
     "@tailwindcss/vite": "^4.3.0",
     "axios": "^1.16.1",
+=======
+    "@rolldown/plugin-babel": "^0.2.3",
+    "@tailwindcss/vite": "^4.3.0",
+    "axios": "^1.16.1",
+    "babel-plugin-react-compiler": "^1.0.0",
+>>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
     "lodash": "^4.18.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.16.0",
+<<<<<<< HEAD
+=======
+    "recharts": "^3.8.1",
+>>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
     "tailwindcss": "^4.3.0",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@babel/core": "^7.29.0",
     "@eslint/js": "^10.0.1",
     "@rolldown/plugin-babel": "^0.2.3",
@@ -29,6 +41,11 @@
     "@types/lodash": "^4.17.24",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
+=======
+    "@babel/core": "^7.25.0",
+    "@types/lodash": "^4.17.24",
+    "@types/react": "^19.2.15",
+>>>>>>> 65651fa49214530880aa95dbe2be01f6d6585cfa
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "babel-plugin-react-compiler": "^1.0.0",

@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import type { HealthKitState, HealthKitActions } from '../hooks/useHealthKit'
+import { groupByDay, fullLabel } from '../lib/chart-data'
 
 const NF = new Intl.NumberFormat('en-US')
 
@@ -12,17 +14,55 @@ export function StepsPage({ state, actions }: { state: HealthKitState; actions: 
   const [maxSamples] = useState(20)
   const stepSum = stepSamples.reduce((s, h) => s + h.value, 0)
 
+  const daily = useMemo(() => groupByDay(stepSamples), [stepSamples])
+
   return (
     <div className="pt-4 space-y-3">
       <h2 className="text-sm font-semibold text-[var(--color-text)] uppercase tracking-wider m-0">Step Counter</h2>
 
-      {/* Stat cards */}
+      {/* Stat card */}
       {totalSteps !== null && (
         <div className="flex justify-between items-center px-5 py-4 rounded-2xl bg-green-500/8 border border-green-500/15">
           <span className="text-sm font-medium text-[var(--color-text)]">Total (7 days)</span>
           <span className="text-3xl font-bold font-mono text-green-500">
             {NF.format(totalSteps)}
           </span>
+        </div>
+      )}
+
+      {/* Daily bar chart */}
+      {daily.length > 0 && (
+        <div className="pt-1">
+          <p className="text-xs font-medium text-[var(--color-text)] mb-2 px-1">Daily steps</p>
+          <div className="rounded-xl bg-green-500/4 border border-green-500/10 p-2">
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={daily} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
+                <XAxis
+                  dataKey="label"
+                  tick={{ fontSize: 11, fill: 'var(--color-text)' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis hide />
+                <Tooltip
+                  contentStyle={{
+                    background: 'var(--color-bg)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                  labelFormatter={(_, payload) => (payload?.[0] ? fullLabel(payload[0].payload.date) : '')}
+                  formatter={(val) => [NF.format(Number(val)), 'steps']}
+                />
+                <Bar
+                  dataKey="value"
+                  fill="#22c55e"
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={32}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       )}
 
@@ -85,9 +125,7 @@ export function StepsPage({ state, actions }: { state: HealthKitState; actions: 
       )}
 
       {!authorized && (
-        <p className="text-sm opacity-50 text-center py-6">
-          Authorize HealthKit on the Dashboard tab first.
-        </p>
+        <p className="text-sm opacity-50 text-center py-6">Authorize HealthKit on the Dashboard tab first.</p>
       )}
     </div>
   )

@@ -66,6 +66,18 @@
 #root {
   width: 100%;
   height: 100dvh;
+  min-height: 0;
   position: relative;
   box-sizing: border-box;
+}
+
+/* Remove focus highlight from charts */
+.recharts-wrapper,
+.recharts-surface,
+.recharts-responsive-container {
+  outline: none !important;
+}
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none !important;
 }
