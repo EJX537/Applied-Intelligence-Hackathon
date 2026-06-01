@@ -23,7 +23,7 @@ import { AdminPage } from './pages/AdminPage'
 import { AdminAiPage } from './pages/AdminAiPage'
 import { AdminPatientPage } from './pages/AdminPatientPage'
 
-// ── Authenticated app ─────────────────────────────────────────────
+// ── Authenticated app (Clients/Patients) ──────────────────────────
 
 function AuthenticatedApp() {
   const { state, actions } = useHealthKitCtx()
@@ -64,7 +64,7 @@ function AuthenticatedApp() {
   )
 }
 
-// ── Auth gate ─────────────────────────────────────────────────────
+// ── Auth gate & Role Resolver ─────────────────────────────────────
 
 function AppContent() {
   const { user, loading } = useAuth()
@@ -81,6 +81,13 @@ function AppContent() {
   }
 
   if (!user) return <AuthPage />
+
+  const providerEmail = (import.meta.env.VITE_PROVIDER_EMAIL ?? 'provider@healthtrack.com').trim().toLowerCase()
+  const isProvider = user.email?.trim().toLowerCase() === providerEmail
+
+  if (isProvider) {
+    return <ProviderDashboard />
+  }
 
   return <AuthenticatedApp />
 }

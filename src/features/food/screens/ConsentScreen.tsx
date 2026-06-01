@@ -31,30 +31,23 @@ export function ConsentScreen() {
 
   return (
     <div className="app-shell p-6 text-center">
-      <div
-        className="w-24 h-24 rounded-full bg-white flex items-center justify-center mx-auto my-6 mb-4 text-[48px]"
-      >
+      <div className="w-24 h-24 rounded-full bg-card-app flex items-center justify-center mx-auto mt-6 mb-4 text-[48px]">
         🍽
       </div>
-      <h1
-        className="text-[22px] font-bold text-[#333333] mb-4"
-      >
+      <h1 className="text-[22px] font-bold text-text-app mb-4">
         How we use your meal photos
       </h1>
-      <div
-        className="bg-white p-4 rounded-xl mb-6 text-left leading-relaxed"
-      >
-        <p className="m-0 mb-2 text-[14px] text-[#333333]">
+      <div className="bg-card-app p-4 rounded-xl mb-6 text-left leading-relaxed">
+        <p className="m-0 mb-2 text-sm text-text-app">
           • Photos are sent to an AI service to identify food items.
         </p>
-        <p className="m-0 mb-2 text-[14px] text-[#333333]">
+        <p className="m-0 mb-2 text-sm text-text-app">
           • Photos are stored privately in your browser and our servers.
         </p>
-        <p className="m-0 mb-2 text-[14px] text-[#333333]">
+        <p className="m-0 mb-2 text-sm text-text-app">
           • Photos are never shared with third parties.
         </p>
-        <p className="m-0 text-[14px] text-[#333333]">
-          • You can delete any photo from your meal log at any time.
+        <p className="m-0 text-sm text-text-app">          • You can delete any photo from your meal log at any time.
         </p>
       </div>
       <button

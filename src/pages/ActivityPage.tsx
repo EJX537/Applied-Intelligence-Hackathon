@@ -30,9 +30,28 @@ export function ActivityPage({ state, actions }: { state: HealthKitState; action
 
   return (
     <div className="pt-4 space-y-4">
+      {/* Premium Header Banner */}
+      <div className="bg-gradient-to-r from-orange-500 to-indigo-600 rounded-2xl p-5 text-white shadow-sm flex justify-between items-center">
+        <div>
+          <span className="text-xs text-white/75 font-semibold tracking-wider uppercase">Fitness & Rest</span>
+          <h2 className="text-xl font-bold m-0 text-white">Activity Logs</h2>
+          <span className="text-xs text-white/80">Workouts & Sleep Tracking</span>
+        </div>
+        <div className="text-right flex gap-3 text-[11px] font-semibold text-white/90">
+          <div>
+            <span className="text-xs text-white/70 block text-right font-normal">Workouts</span>
+            <span className="text-xl font-bold font-mono text-white leading-none">{workouts.length}</span>
+          </div>
+          <div className="border-l border-white/20 pl-3">
+            <span className="text-xs text-white/70 block text-right font-normal">Sleep</span>
+            <span className="text-xl font-bold font-mono text-white leading-none">{sleepSamples.length}d</span>
+          </div>
+        </div>
+      </div>
+
       {/* ── Workouts ── */}
       <div>
-        <h2 className="text-sm font-semibold text-[var(--color-text)] uppercase tracking-wider m-0 mb-2.5">🏃 Workouts</h2>
+        <h2 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider m-0 mb-2">🏃 Workouts</h2>
         <div className="flex gap-2 mb-2.5">
           <button
             onClick={() => actions.queryWorkouts(7)}
@@ -121,7 +140,7 @@ export function ActivityPage({ state, actions }: { state: HealthKitState; action
 
       {/* ── Sleep ── */}
       <div>
-        <h2 className="text-sm font-semibold text-[var(--color-text)] uppercase tracking-wider m-0 mb-2.5">🌙 Sleep</h2>
+        <h2 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider m-0 mb-2">🌙 Sleep</h2>
         <div className="flex gap-2 mb-2.5">
           <button
             onClick={() => actions.querySleep(7)}

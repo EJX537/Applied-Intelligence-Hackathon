@@ -1,16 +1,11 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
-import { createClient, type InsForgeUser } from '../lib/auth'
-
-// Singleton client — instantiated once (swap the import here for real SDK)
-const client = createClient({
-  baseUrl: import.meta.env.VITE_INSFORGE_URL ?? 'http://localhost:7130',
-  anonKey: import.meta.env.VITE_INSFORGE_ANON_KEY ?? 'mock-anon-key',
-})
+import { insforge } from '../shared/api/insforgeClient'
+import type { UserSchema } from '@insforge/sdk'
 
 // ── Context shape ──────────────────────────────────────────────────────
 
 interface AuthContextValue {
-  user: InsForgeUser | null
+  user: UserSchema | null
   loading: boolean
   error: string | null
 
@@ -24,7 +19,7 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 // ── Provider ───────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<InsForgeUser | null>(null)
+  const [user, setUser] = useState<UserSchema | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -32,29 +27,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    client.auth.getCurrentUser().then((res) => {
+    insforge.auth.getCurrentUser().then((res) => {
       if (cancelled) return
       if (res.data?.user) {
         setUser(res.data.user)
       }
       setLoading(false)
+    }).catch(() => {
+      if (!cancelled) setLoading(false)
     })
     return () => { cancelled = true }
   }, [])
 
   const signUp = useCallback(async (email: string, password: string, name?: string) => {
     setError(null)
-    const res = await client.auth.signUp({ email, password, name })
+    const res = await insforge.auth.signUp({ email, password, name })
     if (res.error) {
       setError(res.error.message)
       throw new Error(res.error.message)
     }
-    if (res.data) setUser(res.data.user)
+    if (res.data?.user) setUser(res.data.user)
   }, [])
 
   const signIn = useCallback(async (email: string, password: string) => {
     setError(null)
-    const res = await client.auth.signInWithPassword({ email, password })
+    const cleanEmail = email.trim().toLowerCase()
+    let res = await insforge.auth.signInWithPassword({ email: cleanEmail, password })
+
+    const providerEmail = (import.meta.env.VITE_PROVIDER_EMAIL ?? 'provider@healthtrack.com').trim().toLowerCase()
+    const providerPassword = import.meta.env.VITE_PROVIDER_PASSWORD ?? 'providerpassword'
+
+    if (res.error && cleanEmail === providerEmail && password === providerPassword) {
+      // Auto-signup Provider if account doesn't exist yet
+      const signUpRes = await insforge.auth.signUp({ email: cleanEmail, password, name: 'Provider' })
+      if (!signUpRes.error) {
+        res = await insforge.auth.signInWithPassword({ email: cleanEmail, password })
+      } else {
+        console.warn('[insforge] Auto-signup of provider failed:', signUpRes.error)
+        res.error = signUpRes.error
+      }
+    }
+
     if (res.error) {
       setError(res.error.message)
       throw new Error(res.error.message)
@@ -64,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     setError(null)
-    await client.auth.signOut()
+    await insforge.auth.signOut()
     setUser(null)
   }, [])
 

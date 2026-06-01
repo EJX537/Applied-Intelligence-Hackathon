@@ -142,8 +142,7 @@ export function PortionSelectScreen() {
 
   return (
     <div className="app-shell">
-      <h1 className="text-[20px] font-bold text-[#333333] mb-3">
-        Confirm portions
+      <h1 className="text-[20px] font-bold text-text-app mb-3">        Confirm portions
       </h1>
       {states.map((s, index) => {
         const options = PORTION_SIZES[s.item.category];
@@ -152,21 +151,17 @@ export function PortionSelectScreen() {
         return (
           <div
             key={`${s.originalName}-${index}`}
-            className="bg-white rounded-xl p-3 mb-3"
-          >
+            className="bg-card-app rounded-xl p-3 mb-3"          >
             <div className="flex items-center gap-2">
               <input
                 value={s.editedName}
                 onChange={(e) => update(index, { editedName: e.target.value, edited: true })}
                 aria-label={`Edit name for ${s.originalName}`}
-                className="flex-1 text-[16px] font-semibold text-[#333333] border-0 border-b border-solid border-[#E0E0E0] bg-transparent py-1"
+                className="flex-1 text-base font-semibold text-text-app border-b border-border-app bg-transparent py-1 border-t-0 border-l-0 border-r-0 outline-none"
               />
               <ConfidenceBadge confidence={s.item.confidence} />
             </div>
-            <div
-              className="text-[12px] text-[#666666] uppercase my-1"
-            >
-              {s.item.category}
+            <div className="text-xs text-text-light uppercase my-1">              {s.item.category}
             </div>
             {!isMixed && (
               <PortionPicker
@@ -182,32 +177,26 @@ export function PortionSelectScreen() {
                 onSubmit={(g) => update(index, { portion_grams: g, customActive: true })}
               />
             )}
-            <div
-              className="flex items-center justify-between mt-2"
-            >
-              <span className="text-[#666666] text-[13px]">Quantity</span>
-              <QuantityStepper
+            <div className="flex items-center justify-between mt-2">
+              <span className="text-text-light text-[13px]">Quantity</span>              <QuantityStepper
                 quantity={s.quantity}
                 onChange={(q) => update(index, { quantity: q })}
               />
             </div>
-            <div className="mt-2.5 text-[14px] text-[#333333] font-semibold">
-              {s.portion_grams ?? '—'}g × {s.quantity} = {total}g
+            <div className="mt-2.5 text-sm text-text-app font-semibold">              {s.portion_grams ?? '—'}g × {s.quantity} = {total}g
             </div>
             <div className="flex justify-between mt-3">
               <button
                 type="button"
                 onClick={() => update(index, { edited: true })}
-                className="bg-transparent border-none text-[#2196F3] text-[13px] font-semibold"
-              >
+                className="bg-transparent border-none text-secondary text-[13px] font-semibold"              >
                 Edit name
               </button>
               <button
                 type="button"
                 onClick={() => removeAt(index)}
                 aria-label={`Remove ${s.originalName}`}
-                className="bg-transparent border-none text-[#F44336] text-[13px] font-semibold"
-              >
+                className="bg-transparent border-none text-danger text-[13px] font-semibold"              >
                 Remove
               </button>
             </div>
@@ -217,15 +206,11 @@ export function PortionSelectScreen() {
       <button
         type="button"
         onClick={addManualItem}
-        className="w-full bg-white rounded-xl p-3.5 border border-dashed border-[#E0E0E0] text-[#2196F3] font-semibold"
-      >
+        className="w-full bg-card-app rounded-xl p-3.5 border border-dashed border-border-app text-secondary font-semibold cursor-pointer active:scale-[0.98] transition-transform"      >
         + Add another item manually
       </button>
 
-      <div
-        className="py-4 pb-6 mt-4 border-t border-solid border-[#E0E0E0]"
-      >
-        <button
+      <div className="py-4 pb-6 mt-4 border-t border-border-app">        <button
           type="button"
           onClick={handleConfirm}
           disabled={!allReady || submitting}

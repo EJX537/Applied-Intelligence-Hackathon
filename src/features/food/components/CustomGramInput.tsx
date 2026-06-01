@@ -25,14 +25,12 @@ export function CustomGramInput({ onSubmit }: Props) {
         }}
         placeholder="grams"
         aria-label="Custom portion in grams"
-        className="flex-1 h-10 border border-[#E0E0E0] rounded-lg px-3 bg-white text-[#333333] text-sm"
-      />
+        className="flex-1 h-10 border border-border-app rounded-lg px-3 bg-card-app text-text-app text-sm outline-none"      />
       <button
         type="button"
         onClick={handleSubmit}
         aria-label="Set custom grams"
-        className="bg-[#4CAF50] text-white font-semibold border-none h-10 px-4 rounded-lg"
-      >
+        className="bg-primary text-white font-semibold border-none h-10 px-4 rounded-lg active:scale-[0.98] transition-transform"      >
         Set
       </button>
     </div>

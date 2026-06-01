@@ -11,18 +11,17 @@ export function DailySummary({ totals, targets }: Props) {
   const calPct = Math.min(100, Math.round(calRatio * 100));
 
   return (
-    <div className="bg-white rounded-2xl p-4 mb-3">
+    <div className="bg-card-app rounded-2xl p-4 mb-3">
       <div className="flex items-center gap-4">
         <div
           aria-label={`Calories: ${totals.calories} of ${targets.calories}`}
-          className="w-[110px] h-[110px] rounded-full border-[6px] border-[#4CAF50] flex flex-col items-center justify-center shrink-0"
+          className="w-[110px] h-[110px] rounded-full border-[6px] border-primary flex flex-col items-center justify-center shrink-0"
         >
-          <span className="text-[22px] font-bold text-[#333333]">
+          <span className="text-[22px] font-bold text-text-app">
             {totals.calories}
           </span>
-          <span className="text-[11px] text-[#666666]">of {targets.calories}</span>
-          <span className="text-xs text-[#4CAF50] font-semibold mt-0.5">
-            {calPct}%
+          <span className="text-[11px] text-text-light">of {targets.calories}</span>
+          <span className="text-xs text-primary font-semibold mt-0.5">            {calPct}%
           </span>
         </div>
         <div className="flex-1">
@@ -31,22 +30,19 @@ export function DailySummary({ totals, targets }: Props) {
             value={totals.protein_g}
             target={targets.protein_g}
             unit="g"
-            color="#4CAF50"
-          />
+            color="bg-primary"          />
           <NutrientBar
             label="Carbs"
             value={totals.carbs_g}
             target={targets.carbs_g}
             unit="g"
-            color="#2196F3"
-          />
+            color="bg-secondary"          />
           <NutrientBar
             label="Fat"
             value={totals.fat_g}
             target={targets.fat_g}
             unit="g"
-            color="#FF9800"
-          />
+            color="bg-warning"          />
         </div>
       </div>
     </div>

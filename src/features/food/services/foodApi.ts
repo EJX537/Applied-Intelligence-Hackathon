@@ -2,7 +2,6 @@
 // analyze + search stay mocked for the hackathon demo; logMeal + fetchMeals
 // persist to Insforge so meals survive an app restart.
 
-import apiClient from '../../../shared/api/client';
 import { insforge } from '../../../shared/api/insforgeClient';
 import type {
   AnalyzeResponse,
@@ -18,7 +17,7 @@ import type {
   RecognizedItem,
 } from '../types';
 
-export const MOCK_MODE = true;
+export const MOCK_MODE = false;
 
 const EMPTY_TOTALS: NutritionTotals = {
   calories: 0,
@@ -29,6 +28,20 @@ const EMPTY_TOTALS: NutritionTotals = {
   sugar_g: 0,
   sodium_mg: 0,
 };
+
+// ── Helpers ────────────────────────────────────────────────────────────
+
+/** Return the current Insforge user's ID, or null if not signed in. */
+async function currentUserId(): Promise<string | null> {
+  try {
+    const { data } = await insforge.auth.getCurrentUser();
+    return data?.user?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// ── Mock implementations ───────────────────────────────────────────────
 
 function mockAnalyze(imageBase64: string): AnalyzeResponse {
   const items: RecognizedItem[] = [
@@ -171,6 +184,8 @@ function mockSearch(query: string): SearchFoodResponse {
   return { results: base };
 }
 
+// ── Public API ─────────────────────────────────────────────────────────
+
 export async function analyzeMealPhoto(
   imageBase64: string,
   mealType: string,
@@ -179,10 +194,10 @@ export async function analyzeMealPhoto(
     await new Promise((r) => setTimeout(r, 600));
     return mockAnalyze(imageBase64);
   }
-  const { data } = await apiClient.post<AnalyzeResponse>('/meals/analyze', {
-    image_base64: imageBase64,
-    meal_type: mealType,
+  const { data, error } = await insforge.functions.invoke<AnalyzeResponse>('analyze-meal', {
+    body: { image_base64: imageBase64, meal_type: mealType },
   });
+  if (error || !data) throw error ?? new Error('analyze-meal returned no data');
   return data;
 }
 
@@ -190,12 +205,15 @@ export async function logMeal(data: LogMealRequest): Promise<LogMealResponse> {
   // Build the meal locally (calorie math) using the mock helper.
   const response = mockLogMeal(data);
 
+  const userId = await currentUserId();
+
   // Persist to Insforge. Failure here should not block the demo — fall back
   // to in-memory and surface a console warning.
   try {
     const { error } = await insforge.database.from('meals').insert([
       {
         id: response.meal.id,
+        user_id: userId,
         meal_type: response.meal.meal_type,
         timestamp: response.meal.timestamp,
         image_uri: response.meal.image_uri,
@@ -217,7 +235,12 @@ export async function logMeal(data: LogMealRequest): Promise<LogMealResponse> {
 
 export async function deleteMeal(mealId: string): Promise<void> {
   try {
-    const { error } = await insforge.database.from('meals').delete().eq('id', mealId);
+    const userId = await currentUserId();
+    let query = insforge.database.from('meals').delete().eq('id', mealId);
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
+    const { error } = await query;
     if (error) {
       // eslint-disable-next-line no-console
       console.warn('[insforge] meals.delete failed', error);
@@ -230,6 +253,7 @@ export async function deleteMeal(mealId: string): Promise<void> {
 
 interface InsforgeMealRow {
   id: string;
+  user_id: string | null;
   meal_type: MealEntry['meal_type'];
   timestamp: string;
   image_uri: string | null;
@@ -239,10 +263,17 @@ interface InsforgeMealRow {
 
 export async function fetchMeals(): Promise<MealEntry[]> {
   try {
-    const { data, error } = await insforge.database
+    const userId = await currentUserId();
+    let query = insforge.database
       .from('meals')
       .select('*')
       .order('timestamp', { ascending: false });
+
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
+
+    const { data, error } = await query;
     if (error) {
       // eslint-disable-next-line no-console
       console.warn('[insforge] meals.select failed', error);
@@ -269,6 +300,9 @@ export async function searchFood(query: string): Promise<SearchFoodResponse> {
     await new Promise((r) => setTimeout(r, 250));
     return mockSearch(query);
   }
-  const { data } = await apiClient.post<SearchFoodResponse>('/meals/search', { query });
+  const { data, error } = await insforge.functions.invoke<SearchFoodResponse>('search-food', {
+    body: { query },
+  });
+  if (error || !data) throw error ?? new Error('search-food returned no data');
   return data;
 }

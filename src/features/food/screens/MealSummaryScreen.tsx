@@ -47,9 +47,8 @@ export function MealSummaryScreen() {
 
   const totalsRow = (label: string, value: string) => (
     <div className="flex justify-between mb-1.5">
-      <span className="text-[#666666]">{label}</span>
-      <span className="text-[#333333] font-semibold">{value}</span>
-    </div>
+      <span className="text-text-light">{label}</span>
+      <span className="text-text-app font-semibold">{value}</span>    </div>
   );
 
   return (
@@ -58,8 +57,7 @@ export function MealSummaryScreen() {
         <img
           src={response.meal.image_uri}
           alt="Meal photo thumbnail"
-          className="w-full h-[180px] rounded-xl mb-3 bg-[#E0E0E0] object-cover"
-        />
+          className="w-full h-[180px] rounded-xl mb-3 bg-border-app object-cover"        />
       )}
       <h1 className="screen-heading">Meal logged</h1>
       <div className="screen-subheading">
@@ -67,8 +65,7 @@ export function MealSummaryScreen() {
       </div>
 
       <div className="card">
-        <div className="text-[15px] font-semibold text-[#333333] mb-2">
-          Meal totals
+        <div className="text-[15px] font-semibold text-text-app mb-2">          Meal totals
         </div>
         {totalsRow('Calories', `${response.meal.meal_total.calories} kcal`)}
         {totalsRow('Protein', `${response.meal.meal_total.protein_g} g`)}
@@ -76,20 +73,19 @@ export function MealSummaryScreen() {
         {totalsRow('Fat', `${response.meal.meal_total.fat_g} g`)}
       </div>
 
-      <div className="text-[15px] font-bold text-[#333333] mb-2">Items</div>
+      <div className="text-[15px] font-bold text-text-app mb-2">Items</div>
       {response.meal.items.map((item, idx) => (
         <div
           key={`${item.name}-${idx}`}
-          className="flex items-center bg-white rounded-xl p-3 mb-2"
+          className="flex items-center bg-card-app rounded-[10px] p-3 mb-2"
         >
           <div className="flex-1">
-            <div className="text-[14px] font-semibold text-[#333333]">{item.name}</div>
-            <div className="text-[12px] text-[#666666] mt-0.5">
+            <div className="text-sm font-semibold text-text-app">{item.name}</div>
+            <div className="text-xs text-text-light mt-0.5">
               P {item.protein_g}g · C {item.carbs_g}g · F {item.fat_g}g
             </div>
           </div>
-          <span className="text-[14px] font-bold text-[#4CAF50]">
-            {item.calories} kcal
+          <span className="text-sm font-bold text-primary">            {item.calories} kcal
           </span>
         </div>
       ))}
@@ -103,19 +99,13 @@ export function MealSummaryScreen() {
         />
       ))}
 
-      <div
-        className="mt-3 bg-white rounded-xl p-3.5 text-center"
-      >
-        <div className="text-[15px] font-semibold text-[#333333]">Today's calories</div>
-        <div className="text-[24px] font-extrabold text-[#4CAF50] mt-1">
-          {dailyTotals} kcal
+      <div className="mt-3 bg-card-app rounded-xl p-3.5 text-center">
+        <div className="text-[15px] font-semibold text-text-app">Today's calories</div>
+        <div className="text-2xl font-extrabold text-primary mt-1">          {dailyTotals} kcal
         </div>
       </div>
 
-      <div
-        className="fixed bottom-0 left-0 right-0 p-4 border-t border-solid border-[#E0E0E0] bg-[#F5F5F5]"
-      >
-        <div className="max-w-[640px] mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 p-4 border-t border-border-app bg-background-app z-10">        <div className="max-w-[640px] mx-auto">
           <button
             type="button"
             onClick={() => navigate('/', { replace: true })}
