@@ -1,93 +1,121 @@
-import { useState, useEffect, type FormEvent } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
-import { insforge } from '../shared/api/insforgeClient'
+import { useState, useEffect, type FormEvent } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { insforge } from "../shared/api/insforgeClient";
 
 export function AuthPage() {
-  const { signUp, signIn, error } = useAuth()
-  const [searchParams] = useSearchParams()
+  const { signUp, signIn, error } = useAuth();
+  const [searchParams] = useSearchParams();
 
-  const inviteToken = searchParams.get('token') || new URLSearchParams(window.location.search).get('token')
-  const inviteEmail = searchParams.get('email') || new URLSearchParams(window.location.search).get('email')
+  const inviteToken =
+    searchParams.get("token") ||
+    new URLSearchParams(window.location.search).get("token");
+  const inviteEmail =
+    searchParams.get("email") ||
+    new URLSearchParams(window.location.search).get("email");
 
-  const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [name, setName] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [signupError, setSignupError] = useState<string | null>(null)
+  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [signupError, setSignupError] = useState<string | null>(null);
 
   // Prefill email and force sign-up mode if invite query parameters are present
   useEffect(() => {
     if (inviteToken && inviteEmail) {
-      setMode('sign-up')
-      setEmail(inviteEmail)
+      setMode("sign-up");
+      setEmail(inviteEmail);
     }
-  }, [inviteToken, inviteEmail])
+  }, [inviteToken, inviteEmail]);
 
   async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    setSubmitting(true)
-    setSignupError(null)
+    e.preventDefault();
+    setSubmitting(true);
+    setSignupError(null);
     try {
-      if (mode === 'sign-up') {
+      if (mode === "sign-up") {
         // Sign up client user in Auth backend
-        await signUp(email, password, name || undefined)
+        await signUp(email, password, name || undefined);
 
-        // If client is using an invite token, link them to the provider in DB
-        if (inviteToken) {
-          try {
-            // Retrieve invitation details (provider_id)
-            const { data: invData } = await insforge.database
-              .from('invitations')
-              .select('provider_id')
-              .eq('id', inviteToken)
-              .single()
+        // Auto-create patient record after sign-up
+        try {
+          const currentUserRes = await insforge.auth.getCurrentUser();
+          const clientUser = currentUserRes.data?.user;
 
-            if (invData?.provider_id) {
-              const currentUserRes = await insforge.auth.getCurrentUser()
-              const clientUser = currentUserRes.data?.user
+          if (clientUser) {
+            const clientName = name || email.split("@")[0];
+            const colorsList = [
+              "#FF6B6B",
+              "#007AFF",
+              "#34C759",
+              "#FF9500",
+              "#AF52DE",
+              "#32ADE6",
+              "#5856D6",
+              "#FF3B30",
+            ];
+            const randomColor =
+              colorsList[Math.floor(Math.random() * colorsList.length)];
+            const randomCode =
+              "PT-" + Math.random().toString(36).substr(2, 6).toUpperCase();
 
-              if (clientUser) {
-                // Link client user to a new patient record
-                const clientName = name || email.split('@')[0]
-                const colorsList = ['#FF6B6B', '#007AFF', '#34C759', '#FF9500', '#AF52DE', '#32ADE6', '#5856D6', '#FF3B30']
-                const randomColor = colorsList[Math.floor(Math.random() * colorsList.length)]
-                const randomCode = 'PT-' + Math.random().toString(36).substr(2, 6).toUpperCase()
+            if (inviteToken) {
+              // Invite flow: link to provider
+              const { data: invData } = await insforge.database
+                .from("invitations")
+                .select("provider_id")
+                .eq("id", inviteToken)
+                .single();
 
-                await insforge.database.from('patients').insert([{
-                  id: clientUser.id,
-                  provider_id: invData.provider_id,
-                  patient_code: randomCode,
-                  name: clientName,
-                  age: 35, // default initial value
-                  sex: 'F', // default initial value
-                  diagnosis: 'New patient from invitation link',
-                  color: randomColor
-                }])
+              if (invData?.provider_id) {
+                await insforge.database.from("patients").insert([
+                  {
+                    id: clientUser.id,
+                    provider_id: invData.provider_id,
+                    patient_code: randomCode,
+                    name: clientName,
+                    age: 35,
+                    sex: "F",
+                    diagnosis: "New patient from invitation link",
+                    color: randomColor,
+                  },
+                ]);
 
-                // Update invitation status to registered
                 await insforge.database
-                  .from('invitations')
+                  .from("invitations")
                   .update({
-                    status: 'registered',
-                    registered_at: new Date().toISOString()
+                    status: "registered",
+                    registered_at: new Date().toISOString(),
                   })
-                  .eq('id', inviteToken)
+                  .eq("id", inviteToken);
               }
+            } else {
+              // Direct sign-up: create standalone patient record
+              await insforge.database.from("patients").upsert({
+                id: clientUser.id,
+                patient_code: randomCode,
+                name: clientName,
+                age: 35,
+                sex: "F",
+                diagnosis: "New patient",
+                color: randomColor,
+              });
             }
-          } catch (dbErr) {
-            console.error('Failed to link patient profile or update invitation:', dbErr)
-            // Do not block client sign-in even if DB linking fails temporarily
           }
+        } catch (dbErr) {
+          console.error("Failed to create patient profile:", dbErr);
+          // Do not block sign-in even if patient creation fails
         }
       } else {
-        await signIn(email, password)
+        await signIn(email, password);
       }
     } catch (err: any) {
-      setSignupError(err?.message || 'Authentication failed. Please check your credentials.')
+      setSignupError(
+        err?.message || "Authentication failed. Please check your credentials.",
+      );
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
@@ -102,25 +130,29 @@ export function AuthPage() {
         <div className="flex items-center gap-2.5 mb-8">
           <span className="text-3xl leading-none">💚</span>
           <h1 className="text-2xl font-semibold text-[var(--color-text-h)] tracking-tight m-0">
-            Step Counter
+            VitaTracker
           </h1>
         </div>
 
         {/* Card */}
         <div className="w-full max-w-sm rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] p-6">
           <h2 className="text-lg font-semibold text-[var(--color-text-h)] m-0 mb-1">
-            {inviteToken ? 'Accept Invitation' : mode === 'sign-in' ? 'Sign in' : 'Create account'}
+            {inviteToken
+              ? "Accept Invitation"
+              : mode === "sign-in"
+                ? "Sign in"
+                : "Create account"}
           </h2>
           <p className="text-sm text-[var(--color-text)] mb-5">
             {inviteToken
-              ? 'Complete your profile to join your provider portal'
-              : mode === 'sign-in'
-                ? 'Enter your email and password to continue'
-                : 'Enter your details to get started'}
+              ? "Complete your profile to join your provider portal"
+              : mode === "sign-in"
+                ? "Enter your email and password to continue"
+                : "Enter your details to get started"}
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            {mode === 'sign-up' && (
+            {mode === "sign-up" && (
               <input
                 type="text"
                 placeholder="Name (optional)"
@@ -138,7 +170,7 @@ export function AuthPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={`w-full h-11 px-4 rounded-xl border border-[var(--color-border)] bg-transparent text-sm text-[var(--color-text-h)] outline-none focus:border-green-500/50 transition-colors ${
-                inviteToken ? 'opacity-65 bg-gray-500/5 cursor-not-allowed' : ''
+                inviteToken ? "opacity-65 bg-gray-500/5 cursor-not-allowed" : ""
               }`}
             />
             <input
@@ -160,12 +192,12 @@ export function AuthPage() {
               className="w-full h-11 rounded-xl bg-green-500 text-white text-sm font-semibold cursor-pointer border-none transition-all active:scale-[0.98] disabled:opacity-35 disabled:cursor-not-allowed"
             >
               {submitting
-                ? 'Please wait…'
+                ? "Please wait…"
                 : inviteToken
-                  ? 'Complete sign up'
-                  : mode === 'sign-in'
-                    ? 'Sign in'
-                    : 'Create account'}
+                  ? "Complete sign up"
+                  : mode === "sign-in"
+                    ? "Sign in"
+                    : "Create account"}
             </button>
           </form>
         </div>
@@ -173,11 +205,17 @@ export function AuthPage() {
         {/* Toggle mode (only if not using invitation link) */}
         {!inviteToken && (
           <p className="text-sm text-[var(--color-text)] mt-5">
-            {mode === 'sign-in' ? (
+            {mode === "sign-in" ? (
               <>
-                Don&apos;t have an account?{' '}
+                Don&apos;t have an account?{" "}
                 <button
-                  onClick={() => { setMode('sign-up'); setEmail(''); setPassword(''); setName(''); setSignupError(null) }}
+                  onClick={() => {
+                    setMode("sign-up");
+                    setEmail("");
+                    setPassword("");
+                    setName("");
+                    setSignupError(null);
+                  }}
                   className="text-green-500 font-medium bg-transparent border-none cursor-pointer p-0 text-sm"
                 >
                   Sign up
@@ -185,9 +223,15 @@ export function AuthPage() {
               </>
             ) : (
               <>
-                Already have an account?{' '}
+                Already have an account?{" "}
                 <button
-                  onClick={() => { setMode('sign-in'); setEmail(''); setPassword(''); setName(''); setSignupError(null) }}
+                  onClick={() => {
+                    setMode("sign-in");
+                    setEmail("");
+                    setPassword("");
+                    setName("");
+                    setSignupError(null);
+                  }}
                   className="text-green-500 font-medium bg-transparent border-none cursor-pointer p-0 text-sm"
                 >
                   Sign in
@@ -201,5 +245,5 @@ export function AuthPage() {
       {/* Bottom safe area */}
       <div className="h-[env(safe-area-inset-bottom,0px)]" />
     </div>
-  )
+  );
 }

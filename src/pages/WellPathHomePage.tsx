@@ -1,7 +1,8 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { isNative } from '@pwa-kit/sdk'
-import { useWellPathData } from '../hooks/useWellPathData'
+import { useAuth } from '../contexts/AuthContext'
+import { useWellPathData, syncDeviceStepsToInsforge } from '../hooks/useWellPathData'
 import { useHealthKitCtx } from '../contexts/HealthKitContext'
 import { ScoreCard } from '../features/wellpath/components/ScoreCard'
 import { RewardsCard } from '../features/wellpath/components/RewardsCard'
@@ -83,7 +84,7 @@ function DashboardEmpty({ message }: { message: string }) {
           <path d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
-      <h2 className="mt-4 text-lg font-bold text-slate-900">Welcome to WellPath</h2>
+      <h2 className="mt-4 text-lg font-bold text-slate-900">Welcome to VitaTracker</h2>
       <p className="mt-2 max-w-xs text-sm text-slate-500">{message}</p>
       <button
         type="button"
@@ -99,8 +100,28 @@ function DashboardEmpty({ message }: { message: string }) {
 
 export function WellPathHomePage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const { state: dashState, refetch } = useWellPathData()
   const { state: hkState } = useHealthKitCtx()
+  const syncedRef = useRef(false)
+
+  // ── Sync device steps to InsForge ────────────────────────────
+  // The device value is the source of truth — write it to the DB
+  // so daily_records reflects what the device actually recorded.
+  useEffect(() => {
+    if (
+      syncedRef.current ||
+      !user?.id ||
+      hkState.totalSteps == null ||
+      hkState.loading
+    ) return
+
+    syncedRef.current = true
+    syncDeviceStepsToInsforge(user.id, hkState.totalSteps, user.email).then(() => {
+      // Re-fetch dashboard so the DB value is reflected in the UI
+      refetch()
+    })
+  }, [user?.id, hkState.totalSteps, hkState.loading, refetch])
 
   // ── Merge real step data into dashboard sections ─────────────
   const sections = useMemo(() => {
@@ -111,14 +132,15 @@ export function WellPathHomePage() {
 
       const todaySteps = hkState.totalSteps
       const isLoading = isNative && (hkState.available === null || hkState.loading)
+      const hasMeaningfulSteps = todaySteps != null && todaySteps >= 100
 
       const stepsData: SectionData = {
         ...sec.data,
-        status: todaySteps !== null ? 'logged' : sec.data.status,
-        score: todaySteps !== null
+        status: hasMeaningfulSteps ? 'logged' : sec.data.status,
+        score: hasMeaningfulSteps
           ? Math.min(100, Math.round((todaySteps / 10000) * 100))
           : sec.data.score,
-        detail: todaySteps !== null
+        detail: hasMeaningfulSteps
           ? `${NF.format(todaySteps)} steps today`
           : isLoading
             ? 'Loading step data…'

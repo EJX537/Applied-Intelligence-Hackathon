@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { chatWithAdminAi } from '../features/admin/services/healthAi'
 
 interface Message {
   id: string
@@ -6,28 +7,19 @@ interface Message {
   text: string
 }
 
+// ── Render **bold** markdown as React elements ─────────────────
+
+function renderBold(line: string): React.ReactNode {
+  const parts = line.split(/\*\*(.+?)\*\*/g)
+  return parts.map((part, i) =>
+    i % 2 === 1 ? <strong key={i}>{part}</strong> : part,
+  )
+}
+
 const WELCOME: Message = {
   id: 'welcome',
   role: 'ai',
-  text: "Admin AI at your service. Ask about patient cohorts, program outcomes, gift eligibility trends, or any HealthTrack metric across the population.",
-}
-
-const MOCK_RESPONSES: Record<string, string> = {
-  cohort: "Across all **8 patients**:\n\n- **Baseline average**: 61.4%\n- **3-month average**: 69.6% (+8.2 pts)\n- **6-month average**: 73.1% (+11.7 pts from baseline)\n\nTop performer: Maria Garcia (88% at 6M). Needs attention: James Wilson (47%).",
-  gift: "**Gift card eligibility** (score ≥70% or ≥12pt improvement):\n\n- **Eligible now**: 5 patients\n  - Maria Garcia (88%)\n  - Sarah Johnson (85%)\n  - David Lee (79%)\n  - Emily Brown (71%, +18pt)\n  - Robert Chen (70%, +22pt)\n\n- **Close**: 2 patients within 5 points\n- **Not on track**: 1 patient",
-  steps: "**Population step averages**:\n\n- Baseline: 5,200 steps/day avg\n- 3 months: 6,800 steps/day avg (+31%)\n- 6 months: 7,400 steps/day avg (+42%)\n\nHighest: David Lee (9,100 avg). Lowest: James Wilson (3,200 avg).\n\nEngagement tip: patients who log meals also walk 23% more.",
-  labs: "**Lab data summary**:\n\n- **HbA1c**: Average dropped from 7.8 to 7.1 across cohort (-9%)\n- **LDL**: Average dropped from 145 to 118 (-19%)\n- **Triglycerides**: Average dropped from 180 to 142 (-21%)\n\n3 patients now in normal range across all markers.\n\nNext lab batch due in 12 days for 5 patients.",
-  trends: "**30-day trends**:\n\n- Program-wide score: ↑7.3% MoM\n- Lab compliance: 82% (↑5%)\n- Step logging: 71% (stable)\n- Diet logging: 64% (↓3% — concerning)\n- Oral health check-ins: 58% (↑8% after reminder rollout)\n\nAlert: Diet logging drop needs attention — consider push notification campaign for 3 low-engagement users.",
-}
-
-function mockResponse(input: string): string {
-  const lower = input.toLowerCase()
-  if (lower.includes('cohort') || lower.includes('population') || lower.includes('all patient') || lower.includes('overall') || lower.includes('average')) return MOCK_RESPONSES.cohort
-  if (lower.includes('gift') || lower.includes('eligible') || lower.includes('reward') || lower.includes('incentive')) return MOCK_RESPONSES.gift
-  if (lower.includes('step') || lower.includes('walk') || lower.includes('activity')) return MOCK_RESPONSES.steps
-  if (lower.includes('lab') || lower.includes('hba1c') || lower.includes('ldl') || lower.includes('cholesterol') || lower.includes('blood')) return MOCK_RESPONSES.labs
-  if (lower.includes('trend') || lower.includes('progress') || lower.includes('month') || lower.includes('engagement') || lower.includes('compliance')) return MOCK_RESPONSES.trends
-  return "I can analyze patient **cohorts**, **gift eligibility**, **step trends**, **lab results**, and **program-wide trends**. Try: \"How are overall scores trending?\" or \"Which patients are gift-eligible?\""
+  text: "Admin AI at your service. Ask about patient cohorts, program outcomes, gift eligibility trends, or any WellPath metric across the population.",
 }
 
 export function AdminAiPage() {
@@ -41,24 +33,46 @@ export function AdminAiPage() {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, thinking])
 
-  function handleSend() {
-    const text = input.trim()
-    if (!text || thinking) return
+  const sendMessage = useCallback(async (text: string) => {
+    if (!text.trim() || thinking) return
     setInput('')
 
     const userMsg: Message = { id: crypto.randomUUID(), role: 'user', text }
     setMessages((prev) => [...prev, userMsg])
     setThinking(true)
 
-    setTimeout(() => {
+    try {
+      const conversation = messages
+        .filter((m) => m.id !== 'welcome')
+        .slice(-6)
+        .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.text }))
+
+      const reply = await chatWithAdminAi(text, conversation)
+
       const aiMsg: Message = {
         id: crypto.randomUUID(),
         role: 'ai',
-        text: mockResponse(text),
+        text: reply,
       }
       setMessages((prev) => [...prev, aiMsg])
+    } catch {
+      const aiMsg: Message = {
+        id: crypto.randomUUID(),
+        role: 'ai',
+        text: 'Sorry, I ran into an issue. Please try again.',
+      }
+      setMessages((prev) => [...prev, aiMsg])
+    } finally {
       setThinking(false)
-    }, 1200)
+    }
+  }, [messages, thinking])
+
+  function handleSend() {
+    sendMessage(input)
+  }
+
+  function handleSuggestion(suggestion: string) {
+    sendMessage(suggestion)
   }
 
   return (
@@ -84,7 +98,7 @@ export function AdminAiPage() {
             >
               {msg.text.split('\n').map((line, i) => (
                 <p key={i} className={i > 0 ? 'mt-1.5' : ''}>
-                  {line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}
+                  {renderBold(line)}
                 </p>
               ))}
             </div>
@@ -122,25 +136,9 @@ export function AdminAiPage() {
               <button
                 key={suggestion}
                 type="button"
-                onClick={() => {
-                  setMessages((prev) => [
-                    ...prev,
-                    { id: crypto.randomUUID(), role: 'user', text: suggestion },
-                  ])
-                  setThinking(true)
-                  setTimeout(() => {
-                    setMessages((prev) => [
-                      ...prev,
-                      {
-                        id: crypto.randomUUID(),
-                        role: 'ai',
-                        text: mockResponse(suggestion),
-                      },
-                    ])
-                    setThinking(false)
-                  }, 1200)
-                }}
-                className="rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-600 transition active:bg-slate-100"
+                onClick={() => handleSuggestion(suggestion)}
+                disabled={thinking}
+                className="rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-600 transition active:bg-slate-100 disabled:opacity-50"
               >
                 {suggestion}
               </button>

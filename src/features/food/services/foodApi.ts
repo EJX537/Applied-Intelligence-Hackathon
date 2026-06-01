@@ -1,6 +1,6 @@
 // Food API service: meal analysis, logging, and food search.
-// analyze + search stay mocked for the hackathon demo; logMeal + fetchMeals
-// persist to Insforge so meals survive an app restart.
+// logMeal + fetchMeals persist to Insforge so meals survive an app restart.
+// analyzeMealPhoto now routes through a real VLM model via OpenRouter.
 
 import { insforge } from '../../../shared/api/insforgeClient';
 import type {
@@ -14,8 +14,8 @@ import type {
   FoodItem,
   MealEntry,
   NutritionTotals,
-  RecognizedItem,
 } from '../types';
+import { analyzeMealPhotoVLM } from './visionAnalysis';
 
 export const MOCK_MODE = false;
 
@@ -42,33 +42,6 @@ async function currentUserId(): Promise<string | null> {
 }
 
 // ── Mock implementations ───────────────────────────────────────────────
-
-function mockAnalyze(imageBase64: string): AnalyzeResponse {
-  const items: RecognizedItem[] = [
-    {
-      name: 'Grilled chicken breast',
-      usda_search_term: 'chicken breast grilled',
-      category: 'meat',
-      confidence: 'high',
-    },
-    {
-      name: 'Brown rice',
-      usda_search_term: 'brown rice cooked',
-      category: 'grain',
-      confidence: 'high',
-    },
-    {
-      name: 'Steamed broccoli',
-      usda_search_term: 'broccoli steamed',
-      category: 'vegetable',
-      confidence: 'medium',
-    },
-  ];
-  return {
-    image_uri: `data:image/jpeg;base64,${imageBase64.slice(0, 32)}`,
-    items,
-  };
-}
 
 function mockLogMeal(data: LogMealRequest): LogMealResponse {
   const calsPer100: Record<string, number> = {
@@ -190,15 +163,8 @@ export async function analyzeMealPhoto(
   imageBase64: string,
   mealType: string,
 ): Promise<AnalyzeResponse> {
-  if (MOCK_MODE) {
-    await new Promise((r) => setTimeout(r, 600));
-    return mockAnalyze(imageBase64);
-  }
-  const { data, error } = await insforge.functions.invoke<AnalyzeResponse>('analyze-meal', {
-    body: { image_base64: imageBase64, meal_type: mealType },
-  });
-  if (error || !data) throw error ?? new Error('analyze-meal returned no data');
-  return data;
+  // Send the photo to a real VLM model via OpenRouter
+  return analyzeMealPhotoVLM(imageBase64, mealType);
 }
 
 export async function logMeal(data: LogMealRequest): Promise<LogMealResponse> {

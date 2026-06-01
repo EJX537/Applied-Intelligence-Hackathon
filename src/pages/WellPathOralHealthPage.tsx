@@ -1,5 +1,7 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import { insforge } from '../shared/api/insforgeClient'
 import {
   ORAL_HEALTH_DAILY_WEIGHT,
   ORAL_HEALTH_QUESTIONS,
@@ -11,16 +13,82 @@ import { SectionIcon } from '../features/wellpath/components'
 
 export function WellPathOralHealthPage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [todayScore, setTodayScore] = useState<number | null>(null)
+  const [loadingCheck, setLoadingCheck] = useState(true)
+
+  // ── Check if already submitted today ──
+  useEffect(() => {
+    if (!user?.id) {
+      setLoadingCheck(false)
+      return
+    }
+
+    const today = new Date().toISOString().slice(0, 10)
+    let cancelled = false
+
+    const check = async () => {
+      try {
+        // Resolve patient ID (may differ from auth user ID for seed users)
+        let patientId = user.id
+        if (user.email) {
+          const checkRes = await insforge.database
+            .from('patients')
+            .select('id')
+            .eq('id', user.id)
+            .maybeSingle()
+
+          if (!checkRes.data) {
+            const emailRes = await insforge.database
+              .from('patients')
+              .select('id')
+              .eq('patient_code', user.email)
+              .maybeSingle()
+            if (emailRes.data) {
+              patientId = emailRes.data.id
+            }
+          }
+        }
+
+        const { data } = await insforge.database
+          .from('oral_responses')
+          .select('normalized_score')
+          .eq('patient_id', patientId)
+          .eq('record_date', today)
+          .maybeSingle()
+
+        if (cancelled) return
+        if (data && (data as { normalized_score: number }).normalized_score != null) {
+          setTodayScore((data as { normalized_score: number }).normalized_score)
+          setSubmitted(true)
+        }
+      } catch {
+        // ignore fetch errors
+      } finally {
+        if (!cancelled) setLoadingCheck(false)
+      }
+    }
+
+    check()
+
+    return () => { cancelled = true }
+  }, [user?.id])
 
   const answeredCount = Object.keys(answers).length
   const totalQuestions = ORAL_HEALTH_QUESTIONS.length
   const allAnswered = answeredCount === totalQuestions
   const { rawPoints, scoreOutOf100, dailyContribution } = calculateOralHealthScore(answers)
   const dailyWeightPercent = ORAL_HEALTH_DAILY_WEIGHT * 100
+
+  // Use the saved score when already submitted
+  const displayScore = todayScore ?? scoreOutOf100
+  const displayDailyContribution = submitted && todayScore != null
+    ? Math.round((todayScore * ORAL_HEALTH_DAILY_WEIGHT) * 10) / 10
+    : dailyContribution
 
   function selectOption(questionId: string, optionLabel: string) {
     if (submitting || submitted) return // lock answers once submitted
@@ -34,7 +102,8 @@ export function WellPathOralHealthPage() {
 
     try {
       await submitOralHealthCheckIn({
-        userId: 'PT-009', // Sarah Johnson — will come from auth context later
+        userId: user?.id ?? '',
+        userEmail: user?.email,
         date: new Date().toISOString().slice(0, 10),
         answers,
         scoreOutOf100,
@@ -50,6 +119,19 @@ export function WellPathOralHealthPage() {
       setSubmitting(false)
     }
   }, [allAnswered, submitting, submitted, answers, scoreOutOf100, rawPoints])
+
+  // ── Loading while checking today's status ──
+  if (loadingCheck) {
+    return (
+      <div className="flex min-h-full flex-col items-center justify-center">
+        <svg className="h-8 w-8 animate-spin text-violet-500" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-30" />
+          <path d="M12 2a10 10 0 019.95 9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+        <p className="mt-3 text-sm text-slate-500">Checking today&apos;s status…</p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-full flex-col">
@@ -107,9 +189,13 @@ export function WellPathOralHealthPage() {
               <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <p className="text-sm font-semibold text-emerald-700 mb-1">Check-in saved!</p>
+          <p className="text-sm font-semibold text-emerald-700 mb-1">
+            {todayScore != null ? 'Today\'s check-in complete!' : 'Check-in saved!'}
+          </p>
           <p className="text-xs text-slate-500 mb-6">
-            Today&apos;s oral health has been recorded
+            {todayScore != null
+              ? 'You already completed today\'s oral health check-in'
+              : 'Today\'s oral health has been recorded'}
           </p>
 
           {/* Score card */}
@@ -120,12 +206,12 @@ export function WellPathOralHealthPage() {
             <div className="mt-4 grid grid-cols-2 gap-4">
               <div className="rounded-xl bg-white/10 p-3">
                 <p className="text-[11px] text-violet-200">Oral health score</p>
-                <p className="mt-1 text-3xl font-bold">{scoreOutOf100}</p>
+                <p className="mt-1 text-3xl font-bold">{displayScore}</p>
                 <p className="text-[11px] text-violet-200">out of 100</p>
               </div>
               <div className="rounded-xl bg-white/10 p-3">
                 <p className="text-[11px] text-violet-200">Daily score contribution</p>
-                <p className="mt-1 text-3xl font-bold">{dailyContribution}</p>
+                <p className="mt-1 text-3xl font-bold">{displayDailyContribution}</p>
                 <p className="text-[11px] text-violet-200">
                   {dailyWeightPercent}% of daily score
                 </p>

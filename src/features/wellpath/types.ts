@@ -53,6 +53,10 @@ export interface SectionDef {
   weightPercent: number
   accent: SectionAccent
   icon: string
+  /** Hide the score number on the right side of the card */
+  hideScore?: boolean
+  /** Hide the status pill (Done/Upcoming/To do) */
+  hideStatus?: boolean
 }
 
 export interface SectionData {

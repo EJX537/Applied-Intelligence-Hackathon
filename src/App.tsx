@@ -22,6 +22,7 @@ import { SettingsPage } from './pages/SettingsPage'
 import { AdminPage } from './pages/AdminPage'
 import { AdminAiPage } from './pages/AdminAiPage'
 import { AdminPatientPage } from './pages/AdminPatientPage'
+import { ProviderDashboard } from './pages/ProviderDashboard'
 
 // ── Authenticated app (Clients/Patients) ──────────────────────────
 

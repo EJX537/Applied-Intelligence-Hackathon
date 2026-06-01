@@ -63,7 +63,7 @@ export function SectionCard({ def, data, onNavigate }: Props) {
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <h3 className="font-semibold text-slate-900">{def.title}</h3>
-          <StatusPill status={data.status} />
+          {!def.hideStatus && <StatusPill status={data.status} />}
         </div>
         {def.subtitle && <p className="mt-0.5 text-xs text-slate-500">{def.subtitle}</p>}
         <p className="mt-1.5 text-sm font-medium text-slate-700">{data.detail}</p>
@@ -73,11 +73,11 @@ export function SectionCard({ def, data, onNavigate }: Props) {
       </div>
 
       <div className="flex shrink-0 flex-col items-end gap-2">
-        {data.score !== null ? (
+        {!def.hideScore && data.score !== null ? (
           <span className="text-2xl font-bold text-slate-900">{data.score}</span>
-        ) : (
+        ) : !def.hideScore ? (
           <span className="text-sm font-medium text-slate-400">—</span>
-        )}
+        ) : null}
         {isInteractive && (
           <svg className="h-5 w-5 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
             <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />

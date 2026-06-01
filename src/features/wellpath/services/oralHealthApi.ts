@@ -1,15 +1,11 @@
 // Oral Health API service: submit daily check-in answers.
-//
-// MOCK_MODE = true  ⇒ simulate success so UI is testable without a backend.
-// When ready, flip to false and the POST will hit the real API + Insforge.
+// Persists directly to InsForge's oral_responses table.
 
-import apiClient from '../../../shared/api/client';
-import { insforge, isInsforgeConfigured } from '../../../shared/api/insforgeClient';
-
-export const MOCK_MODE = true;
+import { insforge } from '../../../shared/api/insforgeClient';
 
 export interface OralHealthCheckInPayload {
   userId: string;
+  userEmail?: string; // used to resolve patient ID when auth UUID differs
   date: string; // ISO date string (YYYY-MM-DD)
   answers: Record<string, string>; // questionId → selected label
   scoreOutOf100: number;
@@ -27,30 +23,62 @@ export interface OralHealthCheckInResponse {
 export async function submitOralHealthCheckIn(
   payload: OralHealthCheckInPayload,
 ): Promise<OralHealthCheckInResponse> {
-  if (MOCK_MODE) {
-    // Simulate network latency
-    await new Promise((r) => setTimeout(r, 800))
-    return {
-      id: crypto.randomUUID(),
-      submittedAt: new Date().toISOString(),
+  const id = crypto.randomUUID()
+  const submittedAt = new Date().toISOString()
+
+  // Resolve patient ID (may differ from auth user ID for seed users)
+  let patientId = payload.userId
+  const checkRes = await insforge.database
+    .from('patients')
+    .select('id')
+    .eq('id', payload.userId)
+    .maybeSingle()
+
+  if (!checkRes.data && payload.userEmail) {
+    const emailRes = await insforge.database
+      .from('patients')
+      .select('id')
+      .eq('patient_code', payload.userEmail)
+      .maybeSingle()
+    if (emailRes.data) {
+      patientId = emailRes.data.id
     }
   }
 
-  // Real path — POST to API, then persist in Insforge
-  const { data } = await apiClient.post<OralHealthCheckInResponse>('/oral-health/check-in', payload)
+  // Map question labels to DB constraint values
+  const brushingRaw = (payload.answers.brushing_frequency as string) ?? ''
+  const q_brushing =
+    brushingRaw.includes('2') ? 'twice' :
+    brushingRaw === '1' ? 'once' :
+    'not_today'
 
-  if (isInsforgeConfigured()) {
-    try {
-      await insforge.from('oral_health_check_ins').upsert({
-        id: data.id,
-        ...payload,
-        submittedAt: data.submittedAt,
-      })
-    } catch (insfError) {
-      // Non-critical: log but don't fail the request
-      console.warn('[oralHealthApi] Insforge sync failed', insfError)
-    }
+  const q_fluoride = (payload.answers.fluoride_toothpaste as string)?.toLowerCase() === 'yes'
+
+  const interdentalRaw = (payload.answers.interdental_cleaning as string) ?? ''
+  const q_interdental =
+    interdentalRaw?.toLowerCase() === 'yes' ? 'flossed' : 'none'
+
+  const sugaryRaw = (payload.answers.sugary_drinks as string) ?? ''
+  const q_sugary_drinks =
+    sugaryRaw === '0' ? 'none' :
+    sugaryRaw === '1' ? 'one' :
+    'two_plus'
+
+  const { error } = await insforge.database.from('oral_responses').upsert({
+    patient_id: patientId,
+    record_date: payload.date,
+    q_brushing,
+    q_fluoride,
+    q_interdental,
+    q_sugary_drinks,
+    raw_score: payload.rawPoints,
+    normalized_score: payload.scoreOutOf100,
+  }, { onConflict: 'patient_id, record_date' })
+
+  if (error) {
+    console.warn('[oralHealthApi] Insforge insert failed', error)
+    throw error
   }
 
-  return data
+  return { id, submittedAt }
 }

@@ -1,19 +1,26 @@
-// Insforge backend client.
-// NOTE: Use env vars in Vite (`VITE_INSFORGE_URL`, `VITE_INSFORGE_ANON_KEY`).
+// InsForge backend client.
+// Set VITE_INSFORGE_URL and VITE_INSFORGE_ANON_KEY in .env.local
+// (copy .env.example → .env.local and fill in the values).
 
 import { createClient } from '@insforge/sdk';
 
 const INSFORGE_URL =
   (import.meta.env.VITE_INSFORGE_URL as string | undefined) ??
-  'https://axp58q2i.us-east.insforge.app';
+  'https://axp58q2i.us-east.insforge.app';  // public, not sensitive
 
 const INSFORGE_ANON_KEY =
-  (import.meta.env.VITE_INSFORGE_ANON_KEY as string | undefined) ??
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3OC0xMjM0LTU2NzgtOTBhYi1jZGVmMTIzNDU2NzgiLCJlbWFpbCI6ImFub25AaW5zZm9yZ2UuY29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNTkzNzF9.JWU7NFZiO2nvb2EMenwKS0hvEN-svd0P4HuhRPCQLxw';
+  import.meta.env.VITE_INSFORGE_ANON_KEY as string | undefined;
+
+if (!INSFORGE_ANON_KEY) {
+  console.error(
+    '[insforge] VITE_INSFORGE_ANON_KEY is not set. ' +
+    'Copy .env.example → .env.local and run: npx @insforge/cli secrets get ANON_KEY'
+  );
+}
 
 export const insforge = createClient({
   baseUrl: INSFORGE_URL,
-  anonKey: INSFORGE_ANON_KEY,
+  anonKey: INSFORGE_ANON_KEY ?? '',
 });
 
 export function isInsforgeConfigured(): boolean {

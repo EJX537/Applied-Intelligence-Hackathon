@@ -1,13 +1,7 @@
 // Rewards API service: fetch rewards plan and update progress.
-//
-// MOCK_MODE = true  ⇒ uses the hardcoded milestone plan.
-// When ready, flip to false and data flows from the real API + Insforge.
 
-import apiClient from '../../../shared/api/client';
-import { insforge, isInsforgeConfigured } from '../../../shared/api/insforgeClient';
+import { insforge } from '../../../shared/api/insforgeClient';
 import type { RewardsPlan, RewardMilestone } from '../types';
-
-export const MOCK_MODE = true;
 
 export interface RewardsProgressUpdate {
   userId: string;
@@ -21,38 +15,43 @@ export interface RewardsProgressUpdate {
 export async function fetchRewardsPlan(
   userId: string,
 ): Promise<RewardsPlan> {
-  if (MOCK_MODE) {
-    await new Promise((r) => setTimeout(r, 400))
+  // Always from InsForge
+  const milestoneMonths = [1, 3, 6]
+  const { data: rows } = await insforge.database
+    .from('rewards')
+    .select('*')
+    .eq('patient_id', userId)
+    .order('checkpoint_month', { ascending: true })
+
+  const rewardsRows = (rows ?? []) as Array<{
+    checkpoint_month: number
+    status: string
+    avg_daily_score: number | null
+    avg_completion_pct: number | null
+  }>
+
+  const milestones: RewardMilestone[] = milestoneMonths.map((month) => {
+    const row = rewardsRows.find((r) => r.checkpoint_month === month)
     return {
-      currentMonth: 1,
-      thresholdScore: 70,
-      thresholdCompletion: 80,
-      milestones: [
-        { month: 1, amount: 25, earned: true, score: 85, completion: 86 },
-        { month: 3, amount: 25, earned: false, score: null, completion: null },
-        { month: 6, amount: 50, earned: false, score: null, completion: null },
-      ],
+      month,
+      amount: month === 1 ? 25 : month === 3 ? 25 : 50,
+      earned: row?.status === 'earned',
+      score: row?.avg_daily_score ?? null,
+      completion: row?.avg_completion_pct ?? null,
     }
-  }
+  })
 
-  // Real path: try Insforge first (local cache), then fall back to API
-  if (isInsforgeConfigured()) {
-    try {
-      const records = await insforge
-        .from('rewards_plans')
-        .select()
-        .eq('userId', userId)
-        .single()
-      if (records) {
-        return records as unknown as RewardsPlan
-      }
-    } catch {
-      // Not cached yet — fall through to API
-    }
-  }
+  const currentMonth =
+    rewardsRows.length > 0
+      ? Math.max(...rewardsRows.map((r) => r.checkpoint_month))
+      : 1
 
-  const { data } = await apiClient.get<RewardsPlan>(`/rewards/plan/${userId}`)
-  return data
+  return {
+    currentMonth,
+    thresholdScore: 70,
+    thresholdCompletion: 80,
+    milestones,
+  }
 }
 
 // ── Upsert milestone progress ────────────────────────────────────
@@ -60,18 +59,17 @@ export async function fetchRewardsPlan(
 export async function updateRewardsProgress(
   payload: RewardsProgressUpdate,
 ): Promise<void> {
-  if (MOCK_MODE) {
-    await new Promise((r) => setTimeout(r, 300))
-    return
-  }
+  // Map to the rewards table
+  const { error } = await insforge.database.from('rewards').upsert({
+    patient_id: payload.userId,
+    checkpoint_month: payload.month,
+    status: payload.score >= 70 ? 'earned' : 'pending',
+    avg_daily_score: payload.score,
+    avg_completion_pct: payload.completion,
+  })
 
-  await apiClient.post('/rewards/progress', payload)
-
-  if (isInsforgeConfigured()) {
-    try {
-      await insforge.from('rewards_progress').upsert(payload)
-    } catch (insfError) {
-      console.warn('[rewardsApi] Insforge sync failed', insfError)
-    }
+  if (error) {
+    console.warn('[rewardsApi] upsert failed', error)
+    throw error
   }
 }
