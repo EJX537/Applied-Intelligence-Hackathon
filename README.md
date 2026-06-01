@@ -1,10 +1,10 @@
-# WellPath Health
+# VitaTracker — Health Monitoring App
 
-A hackathon project — a health engagement platform where patients earn rewards through healthy behaviors. Built with React, TypeScript, Vite, and Insforge backend.
+VitaTracker addresses a critical gap in community health care: for adult clients managing chronic or at-risk conditions, care effectively stops at the clinic door. Without consistent monitoring between visits, progress is invisible, motivation fades, and providers have little visibility into how patients are doing day to day. Paper records and missed check-ins make it easy to overlook early warning signs, leaving a population with limited access to regular in-person care without the support they need between appointments.
 
-## Overview
+The app bridges that gap by giving both clients and providers a shared mobile tool across a structured 6-month program. Clients complete health logs at baseline, 3 months, and 6 months covering four weighted indicators: lab results (35%), daily step count (25%), diet and food habits (25%), and oral hygiene (15%). Each client receives a composite progress score, and providers use the dashboard to monitor trends, identify who is falling below target, and intervene early when data raises concern. Clients who reach a score of 70% or improve by 12 or more points from their prior checkpoint earn a Safeway gift card, creating a tangible incentive to stay engaged through the full program.
 
-WellPath lets patients track steps, nutrition, oral health, and clinical labs while earning voucher rewards. Providers manage patients and view progress dashboards. An AI assistant answers questions using the patient's real data.
+Built with React, TypeScript, Vite, and Insforge backend.
 
 ## Structure
 
@@ -32,17 +32,28 @@ src/
 └── hooks/
 ```
 
+## Scoring
+
+| Indicator | Weight |
+|---|---|
+| Lab results | 35% |
+| Daily step count | 25% |
+| Diet and food habits | 25% |
+| Oral hygiene | 15% |
+
+Clients earn a **Safeway gift card** if their composite score reaches **70%** or improves by **12+ points** from their prior checkpoint.
+
 ## Features
 
 - **Dashboard** — daily health overview with step, diet, oral, and lab sections
 - **Step tracking** — from Apple HealthKit via PWA Kit
 - **Food logging** — log meals with nutritional breakdown
 - **Oral health** — daily check-in form with score
-- **Lab data** — clinical lab results visualization per checkpoint
-- **Rewards** — milestone-based voucher system
+- **Lab data** — clinical lab results visualization per checkpoint (baseline, 3mo, 6mo)
+- **Rewards** — milestone-based Safeway gift card system
 - **AI assistant** — OpenRouter-powered chat that answers from your real data
-- **Provider dashboard** — manage patients, view checkpoints, invite new patients
-- **Scoring** — weighted composite score: Labs 35%, Steps 25%, Diet 25%, Oral 15%
+- **Provider dashboard** — manage patients, view checkpoints and trends, invite new patients
+- **Early intervention** — providers can identify at-risk clients and intervene when data raises concern
 
 ## Getting started
 
