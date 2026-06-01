@@ -70,8 +70,8 @@ function AppContent() {
 
   if (!user) return <AuthPage />
 
-  const providerEmail = import.meta.env.VITE_PROVIDER_EMAIL ?? 'provider@healthtrack.com'
-  const isProvider = user.email === providerEmail
+  const providerEmail = (import.meta.env.VITE_PROVIDER_EMAIL ?? 'provider@healthtrack.com').trim().toLowerCase()
+  const isProvider = user.email?.trim().toLowerCase() === providerEmail
 
   if (isProvider) {
     return <ProviderDashboard />

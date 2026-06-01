@@ -54,10 +54,25 @@ export function FoodLogScreen() {
   };
 
   return (
-    <div className="app-shell">
-      <div className="text-sm text-text-light mb-3">{todayLabel()}</div>
+    <div className="pt-4 space-y-4 pb-24">
+      {/* Premium Header Banner */}
+      <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl p-5 text-white shadow-sm flex justify-between items-center">
+        <div>
+          <span className="text-xs text-white/75 font-semibold tracking-wider uppercase">Nutrition</span>
+          <h2 className="text-xl font-bold m-0 text-white">Food Diary</h2>
+          <span className="text-xs text-white/80">{todayLabel()}</span>
+        </div>
+        <div className="text-right">
+          <span className="text-xs text-white/70 block font-semibold">Logged</span>
+          <span className="text-3xl font-extrabold font-mono text-white leading-none">
+            {meals.length}
+            <span className="text-xs font-normal opacity-85 ml-1">meals</span>
+          </span>
+        </div>
+      </div>
+
       <DailySummary totals={dailyTotals} targets={DAILY_TARGETS} />
-      <div className="text-[15px] font-bold text-text-app mb-2">
+      <div className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider m-0">
         Today's meals
       </div>
       {meals.length === 0 ? (

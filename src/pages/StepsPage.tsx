@@ -17,18 +17,23 @@ export function StepsPage({ state, actions }: { state: HealthKitState; actions: 
   const daily = useMemo(() => groupByDay(stepSamples), [stepSamples])
 
   return (
-    <div className="pt-4 space-y-3">
-      <h2 className="text-sm font-semibold text-[var(--color-text)] uppercase tracking-wider m-0">Step Counter</h2>
-
-      {/* Stat card */}
-      {totalSteps !== null && (
-        <div className="flex justify-between items-center px-5 py-4 rounded-2xl bg-green-500/8 border border-green-500/15">
-          <span className="text-sm font-medium text-[var(--color-text)]">Total (7 days)</span>
-          <span className="text-3xl font-bold font-mono text-green-500">
-            {NF.format(totalSteps)}
-          </span>
+    <div className="pt-4 space-y-4">
+      {/* Premium Header Banner */}
+      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-sm flex justify-between items-center">
+        <div>
+          <span className="text-xs text-white/75 font-semibold tracking-wider uppercase">Active Steps</span>
+          <h2 className="text-xl font-bold m-0 text-white">Daily Steps</h2>
+          <span className="text-xs text-white/80">Tracker & Analytics</span>
         </div>
-      )}
+        {totalSteps !== null && (
+          <div className="text-right">
+            <span className="text-xs text-white/70 block font-semibold">7-Day Total</span>
+            <span className="text-3xl font-extrabold font-mono text-white leading-none">
+              {NF.format(totalSteps)}
+            </span>
+          </div>
+        )}
+      </div>
 
       {/* Daily bar chart */}
       {daily.length > 0 && (

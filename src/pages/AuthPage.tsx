@@ -7,8 +7,8 @@ export function AuthPage() {
   const { signUp, signIn, error } = useAuth()
   const [searchParams] = useSearchParams()
 
-  const inviteToken = searchParams.get('token')
-  const inviteEmail = searchParams.get('email')
+  const inviteToken = searchParams.get('token') || new URLSearchParams(window.location.search).get('token')
+  const inviteEmail = searchParams.get('email') || new URLSearchParams(window.location.search).get('email')
 
   const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in')
   const [email, setEmail] = useState('')

@@ -30,16 +30,24 @@ export function HeartPage({ state, actions }: { state: HealthKitState; actions: 
     : null
 
   return (
-    <div className="pt-4 space-y-3">
-      <h2 className="text-sm font-semibold text-[var(--color-text)] uppercase tracking-wider m-0">Heart Rate</h2>
-
-      {/* Current BPM */}
-      {last !== null && (
-        <div className="flex items-center justify-center gap-4 py-6">
-          <span className="text-5xl font-bold font-mono text-red-500">{Math.round(last)}</span>
-          <span className="text-lg text-[var(--color-text)] font-medium">bpm</span>
+    <div className="pt-4 space-y-4">
+      {/* Premium Header Banner */}
+      <div className="bg-gradient-to-r from-rose-500 to-red-600 rounded-2xl p-5 text-white shadow-sm flex justify-between items-center">
+        <div>
+          <span className="text-xs text-white/75 font-semibold tracking-wider uppercase">Vitals</span>
+          <h2 className="text-xl font-bold m-0 text-white">Heart Rate</h2>
+          <span className="text-xs text-white/80">Tracker & Pulse Analytics</span>
         </div>
-      )}
+        {last !== null && (
+          <div className="text-right">
+            <span className="text-xs text-white/70 block font-semibold">Latest Pulse</span>
+            <span className="text-3xl font-extrabold font-mono text-white leading-none">
+              {Math.round(last)}
+              <span className="text-sm font-normal opacity-85 ml-1">bpm</span>
+            </span>
+          </div>
+        )}
+      </div>
 
       {/* Area chart */}
       {timeline.length > 1 && (

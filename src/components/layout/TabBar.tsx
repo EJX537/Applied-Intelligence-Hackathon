@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 
-export type TabId = 'dashboard' | 'steps' | 'food'
+export type TabId = 'dashboard' | 'steps' | 'heart' | 'activity' | 'food'
 
 const tabs: { id: TabId; icon: string; label: string; route: string }[] = [
-  { id: 'dashboard', icon: '◉', label: 'Dashboard', route: '/' },
+  { id: 'dashboard', icon: '🏠', label: 'Dashboard', route: '/' },
   { id: 'steps', icon: '👣', label: 'Steps', route: '/steps' },
+  { id: 'heart', icon: '❤️', label: 'Heart', route: '/heart' },
+  { id: 'activity', icon: '🏃', label: 'Activity', route: '/activity' },
   { id: 'food', icon: '🍽', label: 'Food', route: '/food' },
 ]
 
